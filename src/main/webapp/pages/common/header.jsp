@@ -1,11 +1,17 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Pahana Edu</title>
-    <link rel="stylesheet" href="../../../assets/css/styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<meta charset="UTF-8">
+<title>Pahana Edu</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+	rel="stylesheet">
+<link rel="stylesheet" type="text/css"
+	href="/bookshopManagement/assets/css/styles.css">
+
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+<body class="bg-gray-50 min-h-screen">
