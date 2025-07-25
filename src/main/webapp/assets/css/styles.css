@@ -1,0 +1,121 @@
+@charset "UTF-8";
+
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+
+:root {
+    /* Color variables */
+    --color-primary: #29539B;
+    --color-primary-light: #3D6BB3;
+    --color-primary-hover: #2563EB;
+    --color-secondary: #7EB6FF;
+    --color-text: #252525;
+    --color-disabled: #D9D9D9;
+    --color-white: #F2F4F8;
+    --color-grey: #444547FF;
+    --color-green: #33691E;
+    --color-green-light: #558B2F;
+    --color-success: #1DB67B;
+    --color-warning: #FFAE42;
+    --color-danger: #E34234;
+    --color-background: #F8F6F1;
+
+    /* Font variables */
+    --font-serif: 'Merriweather', serif;
+    --font-sans: 'Merriweather Sans', sans-serif;
+}
+
+body {
+    font-family: var(--font-sans),sans-serif;
+    color: var(--color-text);
+    background-color: var(--color-background);
+    background-image: url("../images/background.jpeg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif), serif;
+    color: var(--color-primary);
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+}
+
+input, textarea, select {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px #3b82f6;
+}
+
+svg, input::placeholder{
+    color: var(--color-text);
+}
+
+.btn-primary{
+    background-color: var(--color-primary);
+    color: var(--color-background);
+}
+
+.btn-primary:hover{
+    background-color: var(--color-primary-hover);
+    color: var(--color-white);
+    cursor: pointer;
+}
+
+.btn-secondary{
+    background-color: var(--color-background);
+    color: var(--color-text);
+}
+
+.btn-secondary:hover{
+    background-color: var(--color-secondary);
+    color: var(--color-text);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-confirm{
+    background-color: var(--color-green);
+    color: var(--color-white);
+}
+
+.btn-confirm:hover{
+    background-color: var(--color-green-light);
+    color: var(--color-white);
+    cursor: pointer;
+}
+
+.btn-close{
+    color: var(--color-primary);
+    background-color: var(--color-background);
+}
+
+.btn-close:hover{
+    color: var(--color-primary-hover);
+    background-color: var(--color-white);
+    border: 1px solid var(--color-primary-hover);
+    cursor: pointer;
+}
+
+.sidebar{
+    background-color: var(--color-background);
+}
+
+nav .sidebar-active{
+    background-color: var(--color-secondary);
+    color: black;
+}
