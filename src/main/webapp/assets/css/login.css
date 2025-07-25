@@ -1,0 +1,16 @@
+@charset "UTF-8";
+
+.card{
+    background-color: var(--color-background);
+}
+
+.btn{
+    background-color: var(--color-primary);
+    color: var(--color-background);
+}
+
+.btn:hover{
+    background-color: var(--color-primary-light);
+    color: var(--color-white);
+    cursor: pointer;
+}
