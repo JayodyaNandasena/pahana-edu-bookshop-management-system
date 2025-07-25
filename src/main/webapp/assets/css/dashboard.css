@@ -1,0 +1,12 @@
+@charset "UTF-8";
+
+.card{
+    background-color: white;
+}
+
+.main-card{
+    background-image: url("../images/bg-card.jpg");
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
