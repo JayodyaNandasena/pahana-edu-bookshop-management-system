@@ -22,14 +22,13 @@
 					class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
 					<div class="mx-6 py-4 flex border-b-2 border-gray-200">
 						<h2 class="flex-1 text-lg font-semibold flex items-center">
-							<i class="fa-solid fa-user mr-3"></i> Customer
-							Details
+							<i class="fa-solid fa-user mr-3"></i> Customer Details
 						</h2>
 
 						<button id="new-customer-btn"
-							class="btn-primary px-6 py-2 rounded-xl font-medium transition-all flex items-center justify-center">
-							<i class="fa-solid fa-user-plus mr-1"></i>
-							<span>New</span>
+							class="btn-primary px-6 py-2 rounded-xl font-medium transition-all flex items-center justify-center"
+							data-dialog-open="new-customer-modal">
+							<i class="fa-solid fa-user-plus mr-1"></i> <span>New</span>
 						</button>
 					</div>
 					<div class="p-6 pt-3 pb-6">
@@ -300,8 +299,8 @@
 					<!-- Action buttons -->
 					<div class="flex flex-col sm:flex-row gap-3">
 						<button type="button" id="cancel-btn"
-							class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors">
-							Cancel</button>
+							class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+							data-dialog-close>Cancel</button>
 						<button type="submit"
 							class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg px-6 py-3 focus:ring-4 focus:ring-blue-300 transition-all transform hover:scale-[1.02] active:scale-[0.98]">
 							<i class="fas fa-user-plus mr-2"></i> Create Customer
@@ -316,6 +315,6 @@
 </div>
 
 <script type="text/javascript"
-	src="/bookshopManagement/assets/js/bill.js"></script>
+	src="/bookshopManagement/assets/js/dialog-controller.js"></script>
 
 <%@ include file="/pages/common/footer.jsp"%>
