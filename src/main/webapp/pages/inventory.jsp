@@ -16,8 +16,7 @@
 				<button id="new-item-btn"
 					class="btn-primary px-6 py-2 rounded-xl font-medium transition-all flex items-center justify-center"
 					data-dialog-open="new-item-modal">
-                    <i class="fa-solid fa-plus mr-2 light-icon"></i>
-					<span>New</span>
+					<i class="fa-solid fa-plus mr-2 light-icon"></i> <span>New</span>
 				</button>
 			</div>
 
@@ -95,7 +94,8 @@
 							<div class="text-center col-span-2">Text Book</div>
 							<div class="text-center text-green-600 font-semibold col-span-2">2500.00</div>
 							<div class="text-center col-span-2">10</div>
-							<div class="text-center">
+							<div class="text-center"
+								data-dialog-open="delete-confirmation-modal">
 								<i
 									class="fa-solid fa-trash text-gray-400 hover:text-red-600 cursor-pointer"></i>
 							</div>
@@ -106,7 +106,8 @@
 							<div class="text-center col-span-2">Text Book</div>
 							<div class="text-center text-green-600 font-semibold col-span-2">200.00</div>
 							<div class="text-center col-span-2">1000</div>
-							<div class="text-center">
+							<div class="text-center"
+								data-dialog-open="delete-confirmation-modal">
 								<i
 									class="fa-solid fa-trash text-gray-400 hover:text-red-600 cursor-pointer"></i>
 							</div>
@@ -226,14 +227,61 @@
 					<div class="flex flex-col sm:flex-row gap-3">
 						<button type="button" id="cancel-btn"
 							class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
-							data-dialog-close>
-							Cancel</button>
+							data-dialog-close>Cancel</button>
 						<button type="submit"
 							class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg px-6 py-3 focus:ring-4 focus:ring-blue-300 transition-all transform hover:scale-[1.02] active:scale-[0.98]">
 							<i class="fa-solid fa-save mr-2"></i> Save Item
 						</button>
 					</div>
 				</form>
+			</div>
+		</div>
+	</div>
+	</dialog>
+
+	<dialog id="delete-confirmation-modal"
+		class="fixed inset-0 items-center justify-center max-w-xl p-0 bg-transparent backdrop-blur-sm">
+	<div
+		class="relative bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden">
+		<!-- Modal content -->
+		<div
+			class="relative bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden">
+			<!-- Modal header -->
+			<div
+				class="bg-gradient-to-r from-red-50 to-red-100 px-6 py-3 border-b border-gray-200">
+				<div class="flex items-center justify-between">
+					<div class="flex items-center space-x-3">
+						<div
+							class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+							<i class="fa-solid fa-triangle-exclamation text-red-600 text-sm"></i>
+						</div>
+						<h3 class="text-xl font-bold text-red-700">Confirm Delete</h3>
+					</div>
+					<button type="button" id="delete-close-btn"
+						class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors
+         focus:outline-none focus:ring-0">
+						<i class="fas fa-times text-gray-500 group-hover:text-gray-700"></i>
+					</button>
+				</div>
+			</div>
+
+			<!-- Modal body -->
+			<div class="px-6 py-5">
+				<p class="text-gray-700 text-base mb-4">
+					Are you sure you want to delete <span class="font-semibold">"Item
+						Name"</span>? <br>This action cannot be undone.
+				</p>
+
+				<!-- Action buttons -->
+				<div class="flex flex-col sm:flex-row gap-3">
+					<button type="button" id="cancel-delete-btn"
+						class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+						data-dialog-close>Cancel</button>
+					<button type="button" id="confirm-delete-btn"
+						class="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg px-6 py-3 focus:ring-4 focus:ring-red-300 transition-all transform hover:scale-[1.02] active:scale-[0.98]">
+						<i class="fa-solid fa-trash mr-2"></i> Delete
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
