@@ -29,7 +29,7 @@
             </li>
 
             <li>
-                <a href="createBill.jsp"
+                <a href="bill.jsp"
                    class="<%= pageName.equals("bill") ? "sidebar-active shadow-sm" : "" %> flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-300 hover:text-gray-900">
                     <i class="fa-solid fa-file-invoice-dollar fa-fw text-base"></i>
                     <span>Create Bill</span>
@@ -37,7 +37,7 @@
             </li>
 
             <li>
-                <a href="manageCustomers.jsp"
+                <a href="customers.jsp"
                    class="<%= pageName.equals("customers") ? "sidebar-active shadow-sm" : "" %> flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-300 hover:text-gray-900">
                     <i class="fa-solid fa-users fa-fw text-base"></i>
                     <span>Manage Customers</span>
@@ -45,7 +45,7 @@
             </li>
 
             <li>
-                <a href="searchInventory.jsp"
+                <a href="inventory.jsp"
                    class="<%= pageName.equals("inventory") ? "sidebar-active shadow-sm" : "" %> flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-300 hover:text-gray-900">
                     <i class="fa-solid fa-magnifying-glass fa-fw text-base"></i>
                     <span>Search Inventory</span>
