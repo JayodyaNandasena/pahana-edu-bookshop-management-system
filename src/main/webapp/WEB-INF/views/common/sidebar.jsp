@@ -1,13 +1,5 @@
-<%
-    // Get the current page name from the request
-    String currentPage = request.getRequestURI();
-    String pageName = currentPage.substring(currentPage.lastIndexOf("/") + 1);
-    
-    // Remove .jsp extension if present
-    if (pageName.endsWith(".jsp")) {
-        pageName = pageName.substring(0, pageName.length() - 4);
-    }
-%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page isELIgnored="false" %>
 
 <div class="sidebar fixed left-0 top-0 h-full w-64 shadow-lg z-50">
     <!-- Logo -->
@@ -21,40 +13,40 @@
     <nav class="mt-6">
         <ul class="space-y-2 px-4">
             <li>
-                <a href="dashboard.jsp"
-                   class="<%= pageName.equals("dashboard") ? "sidebar-active shadow-sm" : "" %> flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-300 hover:text-gray-900">
+                <a href="<c:url value='/dashboard' />"
+                   class="${activePage == 'dashboard' ? 'sidebar-active shadow-sm' : 'hover:bg-gray-300 hover:text-gray-900'} flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600">
                     <i class="fa-solid fa-house fa-fw text-base"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
 
             <li>
-                <a href="bill.jsp"
-                   class="<%= pageName.equals("bill") ? "sidebar-active shadow-sm" : "" %> flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-300 hover:text-gray-900">
+                <a href="<c:url value='/bill' />"
+                   class="${activePage == 'bill' ? 'sidebar-active shadow-sm' : 'hover:bg-gray-300 hover:text-gray-900'} flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600">
                     <i class="fa-solid fa-file-invoice-dollar fa-fw text-base"></i>
                     <span>Create Bill</span>
                 </a>
             </li>
 
             <li>
-                <a href="customers.jsp"
-                   class="<%= pageName.equals("customers") ? "sidebar-active shadow-sm" : "" %> flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-300 hover:text-gray-900">
+                <a href="<c:url value='/customers' />"
+                   class="${activePage == 'customers' ? 'sidebar-active shadow-sm' : 'hover:bg-gray-300 hover:text-gray-900'} flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600">
                     <i class="fa-solid fa-users fa-fw text-base"></i>
                     <span>Manage Customers</span>
                 </a>
             </li>
 
             <li>
-                <a href="inventory.jsp"
-                   class="<%= pageName.equals("inventory") ? "sidebar-active shadow-sm" : "" %> flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-300 hover:text-gray-900">
+                <a href="<c:url value='/inventory' />"
+                   class="${activePage == 'inventory' ? 'sidebar-active shadow-sm' : 'hover:bg-gray-300 hover:text-gray-900'} flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600">
                     <i class="fa-solid fa-magnifying-glass fa-fw text-base"></i>
                     <span>Search Inventory</span>
                 </a>
             </li>
 
             <li>
-                <a href="userGuide.jsp"
-                   class="<%= pageName.equals("userGuide") ? "sidebar-active shadow-sm" : "" %> flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-300 hover:text-gray-900">
+                <a href="<c:url value='/user-guide' />"
+                   class="${activePage == 'user-guide' ? 'sidebar-active shadow-sm' : 'hover:bg-gray-300 hover:text-gray-900'} flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600">
                     <i class="fa-solid fa-circle-question fa-fw text-base"></i>
                     <span>User Guide</span>
                 </a>

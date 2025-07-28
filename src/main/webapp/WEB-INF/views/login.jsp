@@ -24,7 +24,7 @@
 		Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
 		%>
 
-		<form action="Login" method="POST" class="space-y-6">
+		<form action="login" method="POST" class="space-y-6">
 
 			<!-- Username Field -->
 			<div>
@@ -57,7 +57,7 @@
 			      <i class="fa-solid fa-lock"></i>
 			    </span>
 			    <input
-			      type="text"
+			      type="password"
 			      placeholder="Password"
 			      name="password"
 			      class="w-full pl-12 pr-4 py-3 rounded-lg transition-colors placeholder-gray-400

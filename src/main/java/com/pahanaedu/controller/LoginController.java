@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.pahanaedu.service.LoginService;
 import com.pahanaedu.util.Validator;
 
-@WebServlet("/LoginController")
+@WebServlet("/login")
 public class LoginController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private LoginService loginService;
@@ -27,7 +27,8 @@ public class LoginController extends HttpServlet {
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.getRequestDispatcher("index.jsp").forward(request, response);
+		request.getRequestDispatcher("/index.jsp").forward(request, response);
+
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -67,7 +68,7 @@ public class LoginController extends HttpServlet {
 	    }
 	    
 	    if(loginService.login(username, password) != null) {
-	    	request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+	    	response.sendRedirect(request.getContextPath() + "/dashboard");
 	    	return;
 	    }
 	    

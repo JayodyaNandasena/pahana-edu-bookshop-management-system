@@ -10,10 +10,30 @@
 		<description></description>
 		<servlet-class>com.pahanaedu.controller.LoginController</servlet-class>
 	</servlet>
-	<servlet-mapping>
-		<servlet-name>LoginController</servlet-name>
-		<url-pattern>/Login</url-pattern>
-	</servlet-mapping>
+	<servlet>
+		<servlet-name>DashboardController</servlet-name>
+		<display-name>DashboardController</display-name>
+		<description></description>
+		<servlet-class>com.pahanaedu.controller.DashboardController</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>BillController</servlet-name>
+		<display-name>BillController</display-name>
+		<description></description>
+		<servlet-class>com.pahanaedu.controller.BillController</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>CustomersController</servlet-name>
+		<display-name>CustomersController</display-name>
+		<description></description>
+		<servlet-class>com.pahanaedu.controller.CustomersController</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>InventoryController</servlet-name>
+		<display-name>InventoryController</display-name>
+		<description></description>
+		<servlet-class>com.pahanaedu.controller.InventoryController</servlet-class>
+	</servlet>
 	<!-- Not Found Error -->
 	<error-page>
 		<error-code>404</error-code>

@@ -1,11 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8" isELIgnored="false" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <link rel="stylesheet" type="text/css"
 	href="/bookshopManagement/assets/css/dashboard.css">
 
 <%@ include file="/WEB-INF/views/common/header.jsp"%>
-<%@ include file="/WEB-INF/views/common/sidebar.jsp"%>
+
+<jsp:include page="/WEB-INF/views/common/sidebar.jsp" />
 
 <div class="ml-64 flex-1 p-8">
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -20,7 +22,7 @@
 					John!</h2>
 				<p class="text-gray-600 mb-6">Start with the User Guide or
 					create a bill below.</p>
-				<a href="#"
+				<a href="<c:url value='/bill' />"
 					class="btn-primary px-8 py-3 rounded-lg font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700">
 					Create Bill </a>
 			</div>
