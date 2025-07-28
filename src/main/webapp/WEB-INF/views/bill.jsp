@@ -4,8 +4,8 @@
 <link rel="stylesheet" type="text/css"
 	href="/bookshopManagement/assets/css/bill.css">
 
-<%@ include file="/WEB-INF/pages/common/header.jsp"%>
-<%@ include file="/WEB-INF/pages/common/sidebar.jsp"%>
+<%@ include file="/WEB-INF/views/common/header.jsp"%>
+<%@ include file="/WEB-INF/views/common/sidebar.jsp"%>
 
 <div class="ml-64 p-8">
 	<div class="max-w-7xl mx-auto">
@@ -317,4 +317,4 @@
 <script type="text/javascript"
 	src="/bookshopManagement/assets/js/dialog-controller.js"></script>
 
-<%@ include file="/WEB-INF/pages/common/footer.jsp"%>
+<%@ include file="/WEB-INF/views/common/footer.jsp"%>

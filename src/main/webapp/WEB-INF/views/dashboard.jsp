@@ -4,8 +4,8 @@
 <link rel="stylesheet" type="text/css"
 	href="/bookshopManagement/assets/css/dashboard.css">
 
-<%@ include file="/WEB-INF/pages/common/header.jsp"%>
-<%@ include file="/WEB-INF/pages/common/sidebar.jsp"%>
+<%@ include file="/WEB-INF/views/common/header.jsp"%>
+<%@ include file="/WEB-INF/views/common/sidebar.jsp"%>
 
 <div class="ml-64 flex-1 p-8">
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -90,4 +90,4 @@
 	</div>
 </div>
 
-<%@ include file="/WEB-INF/pages/common/footer.jsp"%>
+<%@ include file="/WEB-INF/views/common/footer.jsp"%>
