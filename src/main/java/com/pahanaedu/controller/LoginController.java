@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -28,8 +27,7 @@ public class LoginController extends HttpServlet {
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
-		dispatcher.forward(request, response);
+		request.getRequestDispatcher("index.jsp").forward(request, response);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -39,8 +37,10 @@ public class LoginController extends HttpServlet {
 		try {
 			handleLogin(username, password, request, response);
 		} catch (ServletException | IOException | SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			request.setAttribute("errorMessage", "An unexpected error occurred.");
+            request.getRequestDispatcher("/index.jsp").forward(request, response);
+	        return;
 		}
 		
 		return;
@@ -62,8 +62,7 @@ public class LoginController extends HttpServlet {
 	    // If there are errors, send them back to the form
 	    if (!errors.isEmpty()) {
 	        request.setAttribute("errors", errors);
-	        RequestDispatcher dispatcher = request.getRequestDispatcher("/index.jsp");
-	        dispatcher.forward(request, response);
+	        request.getRequestDispatcher("/index.jsp").forward(request, response);
 	        return;
 	    }
 	    
@@ -74,8 +73,7 @@ public class LoginController extends HttpServlet {
 	    
 	    errors.put("loginError", "Invalid username or password");
 	    request.setAttribute("errors", errors);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/index.jsp");
-        dispatcher.forward(request, response);
+        request.getRequestDispatcher("/index.jsp").forward(request, response);
         return;
 	}
 }

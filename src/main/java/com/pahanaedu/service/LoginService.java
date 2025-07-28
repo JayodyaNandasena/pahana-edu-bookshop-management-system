@@ -25,8 +25,7 @@ public class LoginService {
 	}
 
 	public User login(String username, String password) throws SQLException {
-		// TODO: add password hashing logic here
-		return loginDao.findUserByUsernameAndPassword(username, password);
+		return loginDao.authenticateUser(username, password);
 	}
 
 }
