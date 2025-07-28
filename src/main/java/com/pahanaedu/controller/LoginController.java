@@ -1,6 +1,7 @@
 package com.pahanaedu.controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
@@ -10,14 +11,20 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.pahanaedu.service.LoginService;
 import com.pahanaedu.util.Validator;
 
 @WebServlet("/LoginController")
 public class LoginController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private LoginService loginService;
        
     public LoginController() {
         super();
+    }
+    
+    public void init() throws ServletException {
+        loginService = LoginService.getInstance();
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -29,13 +36,17 @@ public class LoginController extends HttpServlet {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		
-		handleLogin(username, password, request, response);
+		try {
+			handleLogin(username, password, request, response);
+		} catch (ServletException | IOException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-//		request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
 		return;
 	}
 
-	private void handleLogin(String username, String password, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void handleLogin(String username, String password, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
 		HashMap<String, String> errors = new HashMap<>();
 
 	    // Validate username
@@ -55,9 +66,16 @@ public class LoginController extends HttpServlet {
 	        dispatcher.forward(request, response);
 	        return;
 	    }
-        
-        
-		
+	    
+	    if(loginService.login(username, password) != null) {
+	    	request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+	    	return;
+	    }
+	    
+	    errors.put("loginError", "Invalid username or password");
+	    request.setAttribute("errors", errors);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/index.jsp");
+        dispatcher.forward(request, response);
+        return;
 	}
-
 }
