@@ -336,6 +336,13 @@
 
 </div>
 
+<% if (request.getAttribute("openCustomerDialog") != null) { %>
+  <script>
+    window.addEventListener("DOMContentLoaded", function () {
+      document.getElementById("new-customer-modal").showModal();
+    });
+  </script>
+<% } %>
 
 <script type="text/javascript"
 	src="/bookshopManagement/assets/js/dialog-controller.js" defer></script>

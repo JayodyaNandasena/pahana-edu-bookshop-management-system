@@ -33,6 +33,7 @@ public class CustomerController extends HttpServlet {
 		response.sendRedirect(request.getContextPath() + "/customers");
 	}
 
+	// TODO: fix error redirection
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {		
