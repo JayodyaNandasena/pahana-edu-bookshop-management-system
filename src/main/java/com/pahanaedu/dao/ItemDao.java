@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pahanaedu.model.Category;
 import com.pahanaedu.model.Item;
 import com.pahanaedu.util.DbConnectionFactory;
 
@@ -15,7 +16,10 @@ public class ItemDao {
 	public List<Item> all() throws SQLException {
 		List<Item> itemList = new ArrayList<Item>();
 
-		String sql = "SELECT id, name, unit_price, quantity_available FROM item";
+		String sql = "SELECT i.id, i.name, i.unit_price, i.quantity_available, c.name AS category_name "
+				+ "FROM item i "
+				+ "INNER JOIN category c ON i.category_id=c.id "
+				+ "ORDER BY i.id ASC";
 
 		try (Connection conn = DbConnectionFactory.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql);
@@ -27,6 +31,7 @@ public class ItemDao {
 				item.setName(rs.getString("name"));
 				item.setUnitPrice(rs.getDouble("unit_price"));
 				item.setQuantityAvailable(rs.getInt("quantity_available"));
+				item.setCategory(new Category(rs.getString("category_name")));
 				itemList.add(item);
 			}
 		}
@@ -36,7 +41,11 @@ public class ItemDao {
 	public List<Item> byCategory(int categoryId) throws SQLException {
 		List<Item> itemList = new ArrayList<Item>();
 
-		String sql = "SELECT id, name, unit_price, quantity_available FROM item WHERE category_id = ?";
+		String sql = "SELECT i.id, i.name, i.unit_price, i.quantity_available, c.name AS category_name "
+				+ "FROM item i "
+				+ "INNER JOIN category c ON i.category_id=c.id "
+				+ "WHERE category_id = ? "
+				+ "ORDER BY i.id ASC";
 
 		try (Connection conn = DbConnectionFactory.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -49,6 +58,7 @@ public class ItemDao {
 					item.setName(rs.getString("name"));
 					item.setUnitPrice(rs.getDouble("unit_price"));
 					item.setQuantityAvailable(rs.getInt("quantity_available"));
+					item.setCategory(new Category(rs.getString("category_name")));
 					itemList.add(item);
 				}
 			}

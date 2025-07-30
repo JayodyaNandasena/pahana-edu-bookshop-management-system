@@ -73,9 +73,10 @@
 					<div
 						class="bg-gradient-to-r from-gray-50 to-gray-100 px-3 py-4 border-b border-gray-200">
 						<div
-							class="grid grid-cols-9 text-sm font-semibold text-gray-600 uppercase tracking-wide">
-							<div class="text-center col-span-2">Item ID</div>
-							<div class="text-center col-span-2">Name</div>
+							class="grid grid-cols-12 text-sm font-semibold text-gray-600 uppercase tracking-wide">
+							<div class="text-center">Item ID</div>
+							<div class="text-center col-span-3">Name</div>
+							<div class="text-center col-span-3">Category</div>
 							<div class="text-center col-span-2">Price (Rs.)</div>
 							<div class="text-center col-span-2">Quantity</div>
 							<div class="text-center"></div>
@@ -86,9 +87,10 @@
 					<div id="itemsList" class="divide-y divide-gray-100">
 						<c:forEach var="item" items="${items}">
 							<div
-								class="grid grid-cols-9 px-3 py-4 text-gray-700 hover:bg-gray-50 transition duration-150">
-								<div class="text-center font-medium col-span-2">${item.id}</div>
-								<div class="text-center col-span-2">${item.name}</div>
+								class="grid grid-cols-12 px-3 py-4 text-gray-700 hover:bg-gray-50 transition duration-150">
+								<div class="text-center font-medium">${item.id}</div>
+								<div class="text-center col-span-3">${item.name}</div>
+								<div class="text-center col-span-3">${item.category.name}</div>
 								<div class="text-center text-green-600 font-semibold col-span-2">
 									<fmt:formatNumber value="${item.unitPrice}" type="number"
 										minFractionDigits="2" maxFractionDigits="2" />
