@@ -66,4 +66,40 @@ public class ItemDao {
 		return itemList;
 	}
 
+	public List<Item> byIdOrName(String searchTerm) throws SQLException {
+		List<Item> itemList = new ArrayList<Item>();
+
+		String sql = "SELECT i.id, i.name, i.unit_price, i.quantity_available, c.name AS category_name "
+				+ "FROM item i "
+				+ "INNER JOIN category c ON i.category_id=c.id "
+				+ "WHERE i.id = ? OR i.name LIKE ? "
+				+ "ORDER BY i.id ASC";
+
+		try (Connection conn = DbConnectionFactory.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {		
+
+	        // Try to parse the searchTerm as ID (number), else set a dummy ID
+	        try {
+	            stmt.setInt(1, Integer.parseInt(searchTerm));
+	        } catch (NumberFormatException e) {
+	            stmt.setInt(1, -1);
+	        }
+	        
+	        stmt.setString(2, "%" + searchTerm + "%");
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Item item = new Item();
+					item.setId(rs.getInt("id"));
+					item.setName(rs.getString("name"));
+					item.setUnitPrice(rs.getDouble("unit_price"));
+					item.setQuantityAvailable(rs.getInt("quantity_available"));
+					item.setCategory(new Category(rs.getString("category_name")));
+					itemList.add(item);
+				}
+			}
+		}
+		return itemList;
+	}
+
 }

@@ -24,15 +24,18 @@
 		<!-- Search input-->
 		<div
 			class="sticky top-4 z-50 bg-white rounded-2xl shadow-xl border border-blue-300 overflow-hidden px-6 py-4 my-4">
-			<label for="itemSearch" class="text-lg font-semibold mb-2 block">
-				Enter item ID or name and click search </label>
-			<div class="flex gap-3">
-				<input type="text" placeholder="e.g., ITM0001 or text book"
-					class="px-4 py-2" id="itemSearch">
-				<button
-					class="bg-blue-300 text-black font-semibold px-6 rounded-lg hover:bg-blue-400">
-					Search</button>
-			</div>
+			<form action="inventory" method="get">
+				<label for="itemSearch" class="text-lg font-semibold mb-2 block">
+					Enter item ID or name and click search </label>
+				<div class="flex gap-3">
+					<input type="text" name="search" value="${param.search}"
+						placeholder="e.g., ITM0001 or text book" class="px-4 py-2"
+						id="itemSearch">
+					<button type="submit"
+						class="bg-blue-300 text-black font-semibold px-6 rounded-lg hover:bg-blue-400">
+						Search</button>
+				</div>
+			</form>
 		</div>
 
 		<!-- Inventory details -->

@@ -71,9 +71,10 @@ public class AppController extends HttpServlet {
 	private void handleInventoryPage(HttpServletRequest request) {
 		try {
 			List<Category> categories = CategoryService.getInstance().all();
+			List<Item> items;
 			
 			String categoryIdParam = request.getParameter("category");
-			List<Item> items;
+			String searchParam = request.getParameter("search");			
 
 			Integer selectedCategoryId = null;
 
@@ -97,6 +98,9 @@ public class AppController extends HttpServlet {
 			        // Invalid input
 			        items = ItemService.getInstance().all();
 			    }
+			} else if (searchParam != null && !searchParam.isEmpty()){
+				items = ItemService.getInstance().byIdOrName(searchParam);
+				selectedCategoryId = -1;
 			} else {
 			    // No category selected
 			    items = ItemService.getInstance().all();
