@@ -53,27 +53,7 @@ public class AppController extends HttpServlet {
 			request.setAttribute("activePage", "dashboard");
 			break;
 		case "/inventory":
-			try {
-				String categoryIdParam = request.getParameter("category");
-				List<Item> items;
-
-				if (categoryIdParam != null && !categoryIdParam.isEmpty()) {
-					int categoryId = Integer.parseInt(categoryIdParam);
-					items = ItemService.getInstance().byCategory(categoryId);
-				} else {
-					items = ItemService.getInstance().all();
-				}
-
-				List<Category> categories = CategoryService.getInstance().all(); // Assuming this exists
-
-				request.setAttribute("items", items);
-				request.setAttribute("categories", categories);
-				request.setAttribute("selectedCategoryId", categoryIdParam);
-			} catch (SQLException e) {
-				e.printStackTrace();
-				request.setAttribute("error", "Unable to load items.");
-			}
-
+			handleInventoryPage(request);
 			request.setAttribute("activePage", "inventory");
 			targetPage = "/WEB-INF/views/inventory.jsp";
 			break;
@@ -86,5 +66,48 @@ public class AppController extends HttpServlet {
 
 		RequestDispatcher dispatcher = request.getRequestDispatcher(targetPage);
 		dispatcher.forward(request, response);
+	}
+	
+	private void handleInventoryPage(HttpServletRequest request) {
+		try {
+			List<Category> categories = CategoryService.getInstance().all();
+			
+			String categoryIdParam = request.getParameter("category");
+			List<Item> items;
+
+			Integer selectedCategoryId = null;
+
+			if (categoryIdParam != null && !categoryIdParam.isEmpty()) {
+			    try {
+			        int categoryId = Integer.parseInt(categoryIdParam);
+
+			        // Check if this ID exists in the category list
+			        boolean categoryExists = categories.stream()
+			            .anyMatch(c -> c.getId() == categoryId);
+
+			        if (categoryExists) {
+			            selectedCategoryId = categoryId;
+			            items = ItemService.getInstance().byCategory(categoryId);
+			        } else {
+			            // Invalid category
+			            items = ItemService.getInstance().all();
+			        }
+
+			    } catch (NumberFormatException e) {
+			        // Invalid input
+			        items = ItemService.getInstance().all();
+			    }
+			} else {
+			    // No category selected
+			    items = ItemService.getInstance().all();
+			}			
+
+			request.setAttribute("items", items);
+			request.setAttribute("categories", categories);
+			request.setAttribute("selectedCategoryId", selectedCategoryId);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			request.setAttribute("error", "Unable to load items.");
+		}
 	}
 }
