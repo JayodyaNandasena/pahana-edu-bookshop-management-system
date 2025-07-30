@@ -108,20 +108,29 @@
 						</c:forEach>
 					</div>
 
-					<!-- Empty State (if needed) -->
-					<!--
-                    <div id="emptyState" class="p-10 text-center text-gray-500">
-                        <i class="fas fa-box-open text-5xl mb-4 text-gray-300"></i>
-                        <p class="text-lg font-medium">No items available</p>
-                        <p class="text-sm text-gray-400">Start adding inventory items.</p>
-                    </div>
-                    -->
+					<!-- Empty State -->
+					<c:if test="${empty items}">
+						<div id="emptyState" class="p-10 text-center text-gray-500">
+							<i class="fas fa-box-open text-5xl mb-4 text-gray-300"></i>
+							<p class="text-lg font-medium">No Items Found</p>
+							<p class="text-sm text-gray-400 text-add-item"
+								data-dialog-open="new-item-modal">Add New Item</p>
+						</div>
+					</c:if>
 				</div>
 
 				<!-- Pagination -->
 				<div class="flex justify-between items-center mt-6 px-2">
 					<div>
-						<span class="text-sm text-gray-600">Showing 1-2 of 2 items</span>
+						<c:choose>
+							<c:when test="${empty items}">
+								<span class="text-sm text-gray-600">No Items Found</span>
+							</c:when>
+							<c:otherwise>
+								<span class="text-sm text-gray-600"> Showing 1 -
+									${items.size()} of ${items.size()} items </span>
+							</c:otherwise>
+						</c:choose>
 						<p class="text-xs text-gray-400 mt-1">Last updated: Today</p>
 					</div>
 					<div class="flex items-center space-x-3">

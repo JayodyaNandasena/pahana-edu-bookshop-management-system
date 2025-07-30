@@ -9,3 +9,9 @@
 .btn-selected:hover {
 	cursor: pointer;
 }
+
+.text-add-item:hover {
+	color: var(--color-secondary);
+	text-decoration: underline;
+	cursor: pointer;
+}
