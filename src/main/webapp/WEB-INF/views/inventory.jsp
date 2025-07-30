@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <link rel="stylesheet" type="text/css"
 	href="/bookshopManagement/assets/css/customers.css">
@@ -88,30 +90,22 @@
 
 					<!-- Items -->
 					<div id="itemsList" class="divide-y divide-gray-100">
-						<div
-							class="grid grid-cols-9 px-3 py-4 text-gray-700 hover:bg-gray-50 transition duration-150">
-							<div class="text-center font-medium col-span-2">ITM0001</div>
-							<div class="text-center col-span-2">Text Book</div>
-							<div class="text-center text-green-600 font-semibold col-span-2">2500.00</div>
-							<div class="text-center col-span-2">10</div>
-							<div class="text-center"
-								data-dialog-open="delete-confirmation-modal">
-								<i
-									class="fa-solid fa-trash text-gray-400 hover:text-red-600 cursor-pointer"></i>
+						<c:forEach var="item" items="${items}">
+							<div
+								class="grid grid-cols-9 px-3 py-4 text-gray-700 hover:bg-gray-50 transition duration-150">
+								<div class="text-center font-medium col-span-2">${item.id}</div>
+								<div class="text-center col-span-2">${item.name}</div>
+								<div class="text-center text-green-600 font-semibold col-span-2">
+									<fmt:formatNumber value="${item.unitPrice}" type="number" minFractionDigits="2" maxFractionDigits="2"/>
+								</div>
+								<div class="text-center col-span-2">${item.quantityAvailable}</div>
+								<div class="text-center"
+									data-dialog-open="delete-confirmation-modal">
+									<i
+										class="fa-solid fa-trash text-gray-400 hover:text-red-600 cursor-pointer"></i>
+								</div>
 							</div>
-						</div>
-						<div
-							class="grid grid-cols-9 px-3 py-4 text-gray-700 hover:bg-gray-50 transition duration-150">
-							<div class="text-center font-medium col-span-2">ITM0002</div>
-							<div class="text-center col-span-2">Text Book</div>
-							<div class="text-center text-green-600 font-semibold col-span-2">200.00</div>
-							<div class="text-center col-span-2">1000</div>
-							<div class="text-center"
-								data-dialog-open="delete-confirmation-modal">
-								<i
-									class="fa-solid fa-trash text-gray-400 hover:text-red-600 cursor-pointer"></i>
-							</div>
-						</div>
+						</c:forEach>
 					</div>
 
 					<!-- Empty State (if needed) -->
