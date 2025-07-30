@@ -10,33 +10,49 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.pahanaedu.model.Customer;
 import com.pahanaedu.model.enums.PersistResult;
-import com.pahanaedu.service.CustomersService;
+import com.pahanaedu.service.CustomerService;
 import com.pahanaedu.util.Validator;
 
 @WebServlet("/customer")
 public class CustomerController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private CustomersService customersService;
+	private CustomerService customerService;
 
 	public CustomerController() {
 		super();
 	}
 
 	public void init() throws ServletException {
-		customersService = CustomersService.getInstance();
+		customerService = CustomerService.getInstance();
 	}
 
+	// TODO: search by mobile, return name and ID
+	// TODO: search by customer ID or mobile, return customer details and bill
+	// details
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-	        throws ServletException, IOException {
+			throws ServletException, IOException {
 		response.sendRedirect(request.getContextPath() + "/customers");
 	}
 
 	// TODO: fix error redirection
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {		
+			throws ServletException, IOException {
+		String action = request.getParameter("action");
+		
+		if ("searchByMobile".equals(action)) {
+			String mobile = request.getParameter("mobile");
+			request.setAttribute("mobile", mobile);
+			handleSearchByMobile(mobile, request, response);
+			return;
+		}
+
+		if ("getCustomerDetails".equals(action)) {
+		}
+
 		String firstName = request.getParameter("first_name");
 		String lastName = request.getParameter("last_name");
 		String phone = request.getParameter("phone");
@@ -53,6 +69,23 @@ public class CustomerController extends HttpServlet {
 			request.setAttribute("errorMessage", "An unexpected error occurred.");
 			request.getRequestDispatcher(sourcePage).forward(request, response);
 		}
+	}
+
+	private void handleSearchByMobile(String mobile, HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		try {
+			Customer customer = customerService.getByMobile(mobile);
+
+			if (customer == null) {
+				request.setAttribute("errorMessage", "Customer not found with the provided mobile number.");
+			} else {
+				request.setAttribute("customer", customer);
+			}
+		} catch (SQLException e) {
+			request.setAttribute("errorMessage", "An error occurred while searching: " + e.getMessage());
+		}
+
+		request.getRequestDispatcher("/WEB-INF/views/bill.jsp").include(request, response);
 	}
 
 	private void handleCustomerCreate(String firstName, String lastName, String phone, String email, String address,
@@ -88,8 +121,8 @@ public class CustomerController extends HttpServlet {
 		}
 
 		try {
-			PersistResult result = customersService.persist(firstName, lastName, phone, email, address);
-			System.out.println("result : "+ result);
+			PersistResult result = customerService.persist(firstName, lastName, phone, email, address);
+			System.out.println("result : " + result);
 			switch (result) {
 			case SUCCESS:
 				response.sendRedirect(request.getContextPath() + sourcePage);
@@ -125,17 +158,17 @@ public class CustomerController extends HttpServlet {
 
 	// Determines the source page to redirect back to on error
 	private String getSourcePage(HttpServletRequest request) {
-	    String sourcePage = request.getParameter("active_page");
+		String sourcePage = request.getParameter("active_page");
 
-	    if (sourcePage != null && !sourcePage.isBlank()) {
-	        if (!sourcePage.startsWith("/")) {
-	            sourcePage = "/" + sourcePage;
-	        }
-	        return sourcePage;
-	    }
+		if (sourcePage != null && !sourcePage.isBlank()) {
+			if (!sourcePage.startsWith("/")) {
+				sourcePage = "/" + sourcePage;
+			}
+			return sourcePage;
+		}
 
-	    // Default to /customers
-	    return "/customers";
+		// Default to /customers
+		return "/customers";
 	}
 
 	// Preserves form data
