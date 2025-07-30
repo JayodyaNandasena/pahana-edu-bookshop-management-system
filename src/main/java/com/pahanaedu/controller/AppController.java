@@ -13,7 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.tomcat.util.log.SystemLogHandler;
 
+import com.pahanaedu.model.Category;
 import com.pahanaedu.model.Item;
+import com.pahanaedu.service.CategoryService;
 import com.pahanaedu.service.ItemService;
 
 @WebServlet(urlPatterns = { "/", "/bill", "/customers", "/dashboard", "/inventory" })
@@ -52,11 +54,24 @@ public class AppController extends HttpServlet {
 			break;
 		case "/inventory":
 			try {
-				List<Item> items = ItemService.getInstance().all();
+				String categoryIdParam = request.getParameter("category");
+				List<Item> items;
+
+				if (categoryIdParam != null && !categoryIdParam.isEmpty()) {
+					int categoryId = Integer.parseInt(categoryIdParam);
+					items = ItemService.getInstance().byCategory(categoryId);
+				} else {
+					items = ItemService.getInstance().all();
+				}
+
+				List<Category> categories = CategoryService.getInstance().all(); // Assuming this exists
+
 				request.setAttribute("items", items);
+				request.setAttribute("categories", categories);
+				request.setAttribute("selectedCategoryId", categoryIdParam);
 			} catch (SQLException e) {
 				e.printStackTrace();
-				request.setAttribute("error", "Unable to load inventory data.");
+				request.setAttribute("error", "Unable to load items.");
 			}
 
 			request.setAttribute("activePage", "inventory");

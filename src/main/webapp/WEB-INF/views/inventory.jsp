@@ -1,41 +1,38 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 
 <link rel="stylesheet" type="text/css"
-	href="/bookshopManagement/assets/css/customers.css">
+	href="/bookshopManagement/assets/css/inventory.css">
 
 <%@ include file="/WEB-INF/views/common/header.jsp"%>
 <%@ include file="/WEB-INF/views/common/sidebar.jsp"%>
 
 <div class="ml-64 p-8">
 	<div class="max-w-7xl mx-auto">
-		<div class="sticky-header">
-			<!-- Header -->
-			<div class="flex items-center justify-between">
-				<h1 class="text-3xl font-bold mb-2">Manage Inventory</h1>
-				<button id="new-item-btn"
-					class="btn-primary px-6 py-2 rounded-xl font-medium transition-all flex items-center justify-center"
-					data-dialog-open="new-item-modal">
-					<i class="fa-solid fa-plus mr-2 light-icon"></i> <span>New</span>
-				</button>
-			</div>
+		<!-- Header -->
+		<div class="flex items-center justify-between">
+			<h1 class="text-3xl font-bold mb-2">Manage Inventory</h1>
+			<button id="new-item-btn"
+				class="btn-primary px-6 py-2 rounded-xl font-medium transition-all flex items-center justify-center"
+				data-dialog-open="new-item-modal">
+				<i class="fa-solid fa-plus mr-2 light-icon"></i> <span>New</span>
+			</button>
+		</div>
 
-			<!-- Search input-->
-			<div
-				class="sticky top-4 z-50 bg-white rounded-2xl shadow-xl border border-blue-300 overflow-hidden px-6 py-4 my-4">
-				<label for="customerSearch" class="text-lg font-semibold mb-2 block">
-					Enter item ID or name and click search </label>
-				<div class="flex gap-3">
-					<input type="text" placeholder="e.g., ITM0001 or text book"
-						class="px-4 py-2" id="customerSearch">
-					<button
-						class="bg-blue-300 text-black font-semibold px-6 rounded-lg hover:bg-blue-400">
-						Search</button>
-				</div>
+		<!-- Search input-->
+		<div
+			class="sticky top-4 z-50 bg-white rounded-2xl shadow-xl border border-blue-300 overflow-hidden px-6 py-4 my-4">
+			<label for="itemSearch" class="text-lg font-semibold mb-2 block">
+				Enter item ID or name and click search </label>
+			<div class="flex gap-3">
+				<input type="text" placeholder="e.g., ITM0001 or text book"
+					class="px-4 py-2" id="itemSearch">
+				<button
+					class="bg-blue-300 text-black font-semibold px-6 rounded-lg hover:bg-blue-400">
+					Search</button>
 			</div>
-
 		</div>
 
 		<!-- Inventory details -->
@@ -50,24 +47,21 @@
 						Category</h2>
 				</div>
 				<div id="categoryList" class="flex flex-wrap gap-2">
-					<button
-						class="btn-secondary px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold transition duration-200 text-gray-700">
-						Books</button>
-					<button
-						class="btn-secondary px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold transition duration-200 text-gray-700">
-						Stationery</button>
-					<button
-						class="btn-secondary px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold transition duration-200 text-gray-700">
-						Educational Material</button>
-					<button
-						class="btn-secondary px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold transition duration-200 text-gray-700">
-						Gift Items</button>
-					<button
-						class="btn-secondary px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold transition duration-200 text-gray-700">
-						Miscellaneous</button>
-					<button
-						class="btn-secondary px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold transition duration-200 text-gray-700">
-						All</button>
+					<c:forEach var="category" items="${categories}">
+						<form action="inventory" method="get">
+							<input type="hidden" name="category" value="${category.id}" />
+							<button type="submit"
+								class="${selectedCategoryId == category.id ? 'btn-selected' : 'btn-secondary'} px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold transition duration-200 text-gray-700">
+								${category.name}</button>
+						</form>
+					</c:forEach>
+
+					<!-- "All" button to remove the filter -->
+					<form action="inventory" method="get">
+						<button type="submit"
+							class="${selectedCategoryId == null ? 'btn-selected' : 'btn-secondary'} px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold transition duration-200 text-gray-700">
+							All</button>
+					</form>
 				</div>
 			</div>
 
@@ -96,7 +90,8 @@
 								<div class="text-center font-medium col-span-2">${item.id}</div>
 								<div class="text-center col-span-2">${item.name}</div>
 								<div class="text-center text-green-600 font-semibold col-span-2">
-									<fmt:formatNumber value="${item.unitPrice}" type="number" minFractionDigits="2" maxFractionDigits="2"/>
+									<fmt:formatNumber value="${item.unitPrice}" type="number"
+										minFractionDigits="2" maxFractionDigits="2" />
 								</div>
 								<div class="text-center col-span-2">${item.quantityAvailable}</div>
 								<div class="text-center"

@@ -28,4 +28,8 @@ public class ItemService {
 	public List<Item> all() throws SQLException {
 		return itemDao.all();
 	}
+
+	public List<Item> byCategory(int categoryId) throws SQLException {
+		return itemDao.byCategory(categoryId);
+	}
 }

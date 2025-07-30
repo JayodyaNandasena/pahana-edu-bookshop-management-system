@@ -33,4 +33,27 @@ public class ItemDao {
 		return itemList;
 	}
 
+	public List<Item> byCategory(int categoryId) throws SQLException {
+		List<Item> itemList = new ArrayList<Item>();
+
+		String sql = "SELECT id, name, unit_price, quantity_available FROM item WHERE category_id = ?";
+
+		try (Connection conn = DbConnectionFactory.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setInt(1, categoryId);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Item item = new Item();
+					item.setId(rs.getInt("id"));
+					item.setName(rs.getString("name"));
+					item.setUnitPrice(rs.getDouble("unit_price"));
+					item.setQuantityAvailable(rs.getInt("quantity_available"));
+					itemList.add(item);
+				}
+			}
+		}
+		return itemList;
+	}
+
 }
