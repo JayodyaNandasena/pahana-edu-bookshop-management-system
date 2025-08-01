@@ -29,8 +29,6 @@ public class CustomerController extends HttpServlet {
 	}
 
 	// TODO: search by mobile, return name and ID
-	// TODO: search by customer ID or mobile, return customer details and bill
-	// details
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {

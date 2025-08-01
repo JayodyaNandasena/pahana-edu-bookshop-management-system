@@ -22,15 +22,18 @@
 		<!-- Search input-->
 		<div
 			class="sticky top-4 z-50 bg-white rounded-2xl shadow-xl border border-blue-300 overflow-hidden px-6 py-4 my-4">
-			<label for="customerSearch" class="text-lg font-semibold mb-2 block">
-				Enter customer ID or mobile number and click search </label>
-			<div class="flex gap-3">
-				<input type="text" placeholder="e.g., CUS0001 or 0700000000"
-					class="px-4 py-2" id="customerSearch">
-				<button
-					class="bg-blue-300 text-black font-semibold px-6 rounded-lg hover:bg-blue-400">
-					Search</button>
-			</div>
+			<form action="customers" method="get">
+				<label for="q" class="text-lg font-semibold mb-2 block">
+					Enter customer ID or mobile number and click search </label>
+				<div class="flex gap-3">
+					<input type="text" name="q" value="${param.q}"
+						placeholder="e.g., CUS0001 or 0700000000" class="px-4 py-2"
+						id="itemSearch" required>
+					<button type="submit"
+						class="bg-blue-300 text-black font-semibold px-6 rounded-lg hover:bg-blue-400">
+						Search</button>
+				</div>
+			</form>
 		</div>
 
 		<!-- Customer details -->
@@ -43,7 +46,16 @@
 					<h2 class="text-xl font-semibold">Customer Details</h2>
 				</div>
 				<div class="flex space-x-2">
-					<span class="status-badge status-paid">Active</span>
+					<c:if test="${customer != null}">
+						<c:choose>
+							<c:when test="${customer.isActive}">
+								<span class="status-badge status-active">Active</span>
+							</c:when>
+							<c:otherwise>
+								<span class="status-badge status-inactive">Inactive</span>
+							</c:otherwise>
+						</c:choose>
+					</c:if>
 				</div>
 			</div>
 			<div class="pt-4">
@@ -52,7 +64,7 @@
 					<div>
 						<label for="customer-id"
 							class="block text-sm font-medium text-gray-700 mb-1">Customer
-							ID</label> <input id="customer-id" type="text" value="CUS0002"
+							ID</label> <input id="customer-id" type="text" value="${customer.id}"
 							class="px-4 py-2" readonly disabled />
 					</div>
 
@@ -60,36 +72,41 @@
 					<div>
 						<label for="units"
 							class="block text-sm font-medium text-gray-700 mb-1">Total
-							Units Consumed</label> <input id="units" type="text" value="50"
-							class="px-4 py-2" readonly disabled />
+							Units Consumed</label> <input id="units" type="text"
+							value="${customer.unitsConsumed}" class="px-4 py-2" readonly
+							disabled />
 					</div>
 
 					<!-- First Name -->
 					<div>
 						<label for="first-name"
 							class="block text-sm font-medium text-gray-700 mb-1">First
-							Name</label> <input id="first-name" type="text" class="px-4 py-2" />
+							Name</label> <input id="first-name" type="text" class="px-4 py-2"
+							value="${customer.firstName}" />
 					</div>
 
 					<!-- Last Name -->
 					<div>
 						<label for="last-name"
 							class="block text-sm font-medium text-gray-700 mb-1">Last
-							Name</label> <input id="last-name" type="text" class="px-4 py-2" />
+							Name</label> <input id="last-name" type="text" class="px-4 py-2"
+							value="${customer.lastName}" />
 					</div>
 
 					<!-- Mobile Number -->
 					<div>
 						<label for="mobile"
 							class="block text-sm font-medium text-gray-700 mb-1">Mobile
-							Number</label> <input id="mobile" type="text" class="px-4 py-2" />
+							Number</label> <input id="mobile" type="text" class="px-4 py-2"
+							value="${customer.phone}" />
 					</div>
 
 					<!-- Email -->
 					<div>
 						<label for="email"
 							class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-						<input id="email" type="email" class="px-4 py-2" />
+						<input id="email" type="email" class="px-4 py-2"
+							value="${customer.email}" />
 					</div>
 
 					<!-- Home Address -->
@@ -97,7 +114,7 @@
 						<label for="address"
 							class="block text-sm font-medium text-gray-700 mb-1">Home
 							Address</label>
-						<textarea id="address" rows="3" class="px-4 py-2"></textarea>
+						<textarea id="address" rows="3" class="px-4 py-2">${customer.address}</textarea>
 					</div>
 				</div>
 
@@ -148,40 +165,45 @@
 
 					<!-- Items List -->
 					<div id="itemsList" class="divide-y divide-gray-100">
-						<div
-							class="grid grid-cols-9 px-3 py-4 text-gray-700 hover:bg-gray-50 transition-colors duration-150">
-							<div class="text-center font-medium col-span-2">INV0001</div>
-							<div class="text-center col-span-2">19/07/2025</div>
-							<div class="text-center col-span-2">12:03 PM</div>
-							<div class="text-center text-green-600 font-semibold col-span-2">2500.00</div>
-							<div class="text-center">
-								<i
-									class="fa fa-angle-right text-gray-400 hover:text-gray-600 cursor-pointer"
-									aria-hidden="true"></i>
-							</div>
-						</div>
-						<div
-							class="grid grid-cols-9 px-3 py-4 text-gray-700 hover:bg-gray-50 transition-colors duration-150">
-							<div class="text-center font-medium col-span-2">INV0002</div>
-							<div class="text-center col-span-2">20/07/2025</div>
-							<div class="text-center col-span-2">03:45 PM</div>
-							<div class="text-center text-green-600 font-semibold col-span-2">1800.00</div>
-							<div class="text-center">
-								<i
-									class="fa fa-angle-right text-gray-400 hover:text-gray-600 cursor-pointer"
-									aria-hidden="true"></i>
-							</div>
-						</div>
+						<c:if test="${customer != null && not empty customer.bills}">
+							<c:forEach var="bill" items="${customer.bills}">
+								<div
+									class="grid grid-cols-9 px-3 py-4 text-gray-700 hover:bg-gray-50 transition-colors duration-150">
+									<div class="text-center font-medium col-span-2">${bill.id}</div>
+									<div class="text-center col-span-2">${bill.date}</div>
+									<div class="text-center col-span-2">${bill.time}</div>
+									<div
+										class="text-center text-green-600 font-semibold col-span-2">${bill.total}</div>
+									<div class="text-center">
+										<i
+											class="fa fa-angle-right text-gray-400 hover:text-gray-600 cursor-pointer"
+											aria-hidden="true"></i>
+									</div>
+								</div>
+							</c:forEach>
+						</c:if>
 					</div>
 
-					<!-- Empty State (Uncomment when needed) -->
-					<!--
-                    <div id="emptyState" class="p-8 text-center text-gray-500">
-                      <i class="fas fa-shopping-cart text-4xl mb-4 text-gray-300"></i>
-                      <p class="text-lg font-medium">No invoices added yet</p>
-                      <p class="text-sm">Add invoices using Create Bill</p>
-                    </div>
-                    -->
+					<!-- Empty Bill State -->
+					<c:if test="${customer != null && empty customer.bills}">
+						<div id="emptyState" class="p-8 text-center text-gray-500">
+							<i class="fas fa-shopping-cart text-4xl mb-4 text-gray-300"></i>
+							<p class="text-lg font-medium">No bills added yet</p>
+							<a href="<c:url value='/bill'/>" class="text-sm">Add a bill
+								using <span class="text-add-bill">Create Bill</span>
+							</a>
+						</div>
+					</c:if>
+					
+					<!-- Empty Customer State -->
+					<c:if test="${customer = null || empty customer}">
+						<div id="emptyState" class="p-8 text-center text-gray-500">
+							<i class="fa-solid fa-users-slash text-4xl mb-4 text-gray-300"></i>
+							<p class="text-lg font-medium">No Customer Found</p>
+							<p class="text-sm text-gray-400 text-add-bill"
+								data-dialog-open="new-customer-modal">Add New Customer</p>
+						</div>
+					</c:if>
 				</div>
 			</div>
 
@@ -336,13 +358,17 @@
 
 </div>
 
-<% if (request.getAttribute("openCustomerDialog") != null) { %>
-  <script>
-    window.addEventListener("DOMContentLoaded", function () {
-      document.getElementById("new-customer-modal").showModal();
-    });
-  </script>
-<% } %>
+<%
+if (request.getAttribute("openCustomerDialog") != null) {
+%>
+<script>
+	window.addEventListener("DOMContentLoaded", function() {
+		document.getElementById("new-customer-modal").showModal();
+	});
+</script>
+<%
+}
+%>
 
 <script type="text/javascript"
 	src="/bookshopManagement/assets/js/dialog-controller.js" defer></script>

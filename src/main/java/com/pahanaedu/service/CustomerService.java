@@ -32,4 +32,8 @@ public class CustomerService {
 	public Customer getByMobile(String mobile) throws SQLException {
 		return customerDao.getByMobile(mobile);
 	}
+
+	public Customer byIdOrPhone(String searchTerm) throws SQLException {
+		return customerDao.byIdOrPhone(searchTerm);
+	}
 }

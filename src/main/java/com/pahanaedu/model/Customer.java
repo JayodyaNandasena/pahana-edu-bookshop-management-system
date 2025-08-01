@@ -1,5 +1,7 @@
 package com.pahanaedu.model;
 
+import java.util.List;
+
 public class Customer {
 	private int id;
 	private String firstName;
@@ -9,12 +11,13 @@ public class Customer {
 	private String address;
 	private int unitsConsumed;
 	private boolean isActive;
+	private List<Bill> bills;
 
 	public Customer() {
 	}
 
 	public Customer(int id, String firstName, String lastName, String email, String phone, String address,
-			int unitsConsumed, boolean isActive) {
+			int unitsConsumed, boolean isActive, List<Bill> bills) {
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -23,6 +26,7 @@ public class Customer {
 		this.address = address;
 		this.unitsConsumed = unitsConsumed;
 		this.isActive = isActive;
+		this.bills = bills;
 	}
 
 	public Customer(int id, String firstName, String lastName) {
@@ -87,11 +91,20 @@ public class Customer {
 		this.unitsConsumed = unitsConsumed;
 	}
 
-	public boolean isActive() {
+	public boolean getIsActive() {
 		return isActive;
 	}
 
-	public void setActive(boolean isActive) {
+	public void setIsActive(boolean isActive) {
 		this.isActive = isActive;
 	}
+
+	public List<Bill> getBills() {
+		return bills;
+	}
+
+	public void setBills(List<Bill> bills) {
+		this.bills = bills;
+	}
+
 }

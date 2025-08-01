@@ -17,12 +17,18 @@ i.blue-icon {
     letter-spacing: 0.5px;
 }
 
-.status-paid {
+.status-active {
     background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
     color: #155724;
 }
 
-.status-pending {
+.status-inactive {
     background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
     color: #856404;
+}
+
+.text-add-bill:hover {
+	color: var(--color-secondary);
+	text-decoration: underline;
+	cursor: pointer;
 }

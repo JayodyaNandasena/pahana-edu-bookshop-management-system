@@ -4,7 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.pahanaedu.model.Bill;
 import com.pahanaedu.model.Customer;
 import com.pahanaedu.model.enums.PersistResult;
 import com.pahanaedu.util.DbConnectionFactory;
@@ -69,6 +75,66 @@ public class CustomerDao {
 		}
 
 		return customer;
+	}
+
+	public Customer byIdOrPhone(String searchTerm) throws SQLException {
+	    Customer customer = null;
+
+	    String sql = "SELECT " +
+	            "c.id, c.first_name, c.last_name, c.email, c.phone, c.address, c.units_consumed, c.is_active, " +
+	            "JSON_ARRAYAGG(JSON_OBJECT('bill_id', b.id, 'total', b.total, 'date', b.bill_date, 'time', b.bill_time)) AS bills " +
+	            "FROM customer c " +
+	            "LEFT JOIN bill b ON c.id = b.customer_id " +
+	            "WHERE c.id = ? OR c.phone = ? " +
+	            "GROUP BY c.id";
+
+	    try (Connection conn = DbConnectionFactory.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+	        try {
+	            stmt.setInt(1, Integer.parseInt(searchTerm));
+	        } catch (NumberFormatException e) {
+	            stmt.setInt(1, -1); // Dummy value
+	        }
+
+	        stmt.setString(2, searchTerm);
+
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) {
+	                customer = new Customer();
+	                customer.setId(rs.getInt("id"));
+	                customer.setFirstName(rs.getString("first_name"));
+	                customer.setLastName(rs.getString("last_name"));
+	                customer.setEmail(rs.getString("email"));
+	                customer.setPhone(rs.getString("phone"));
+	                customer.setAddress(rs.getString("address"));
+	                customer.setUnitsConsumed(rs.getInt("units_consumed"));
+	                customer.setIsActive(rs.getBoolean("is_active"));
+
+	                String billsJson = rs.getString("bills");
+	                List<Bill> bills = new ArrayList<>();
+
+	                if (billsJson != null && !billsJson.equals("[null]")) {
+	                    JSONArray billArray = new JSONArray(billsJson);
+	                    for (int i = 0; i < billArray.length(); i++) {
+	                        JSONObject billObj = billArray.getJSONObject(i);
+	                        if (billObj.isNull("bill_id")) continue; // Skip null entries from LEFT JOIN
+	                        Bill bill = new Bill();
+	                        bill.setId(billObj.getInt("bill_id"));
+	                        bill.setTotal(billObj.getDouble("total"));
+	                        bill.setDate(billObj.getString("date"));
+	                        bill.setTime(billObj.getString("time"));
+	                        bill.setCustomer(null);
+	                        bills.add(bill);
+	                    }
+	                }
+
+	                customer.setBills(bills);
+	            }
+	        }
+	    }
+
+	    return customer;
 	}
 
 }
