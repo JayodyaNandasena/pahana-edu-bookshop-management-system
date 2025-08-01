@@ -22,6 +22,16 @@
 		<description></description>
 		<servlet-class>com.pahanaedu.controller.AppController</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>ItemController</servlet-name>
+		<display-name>ItemController</display-name>
+		<description></description>
+		<servlet-class>com.pahanaedu.controller.ItemController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ItemController</servlet-name>
+		<url-pattern>/ItemController</url-pattern>
+	</servlet-mapping>
 	<!-- Not Found Error -->
 	<error-page>
 		<error-code>404</error-code>

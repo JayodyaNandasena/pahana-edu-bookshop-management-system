@@ -17,8 +17,7 @@ public class ItemDao {
 		List<Item> itemList = new ArrayList<Item>();
 
 		String sql = "SELECT i.id, i.name, i.unit_price, i.quantity_available, c.name AS category_name "
-				+ "FROM item i "
-				+ "INNER JOIN category c ON i.category_id=c.id "
+				+ "FROM item i " + "INNER JOIN category c ON i.category_id=c.id " + "WHERE i.is_deleted = false "
 				+ "ORDER BY i.id ASC";
 
 		try (Connection conn = DbConnectionFactory.getConnection();
@@ -42,10 +41,8 @@ public class ItemDao {
 		List<Item> itemList = new ArrayList<Item>();
 
 		String sql = "SELECT i.id, i.name, i.unit_price, i.quantity_available, c.name AS category_name "
-				+ "FROM item i "
-				+ "INNER JOIN category c ON i.category_id=c.id "
-				+ "WHERE category_id = ? "
-				+ "ORDER BY i.id ASC";
+				+ "FROM item i " + "INNER JOIN category c ON i.category_id=c.id "
+				+ "WHERE category_id = ? AND i.is_deleted = 0 " + "ORDER BY i.id ASC";
 
 		try (Connection conn = DbConnectionFactory.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -70,22 +67,20 @@ public class ItemDao {
 		List<Item> itemList = new ArrayList<Item>();
 
 		String sql = "SELECT i.id, i.name, i.unit_price, i.quantity_available, c.name AS category_name "
-				+ "FROM item i "
-				+ "INNER JOIN category c ON i.category_id=c.id "
-				+ "WHERE i.id = ? OR i.name LIKE ? "
+				+ "FROM item i " + "INNER JOIN category c ON i.category_id=c.id " + "WHERE i.id = ? OR i.name LIKE ? "
 				+ "ORDER BY i.id ASC";
 
 		try (Connection conn = DbConnectionFactory.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {		
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-	        // Try to parse the searchTerm as ID (number), else set a dummy ID
-	        try {
-	            stmt.setInt(1, Integer.parseInt(searchTerm));
-	        } catch (NumberFormatException e) {
-	            stmt.setInt(1, -1);
-	        }
-	        
-	        stmt.setString(2, "%" + searchTerm + "%");
+			// Try to parse the searchTerm as ID (number), else set a dummy ID
+			try {
+				stmt.setInt(1, Integer.parseInt(searchTerm));
+			} catch (NumberFormatException e) {
+				stmt.setInt(1, -1);
+			}
+
+			stmt.setString(2, "%" + searchTerm + "%");
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -100,6 +95,22 @@ public class ItemDao {
 			}
 		}
 		return itemList;
+	}
+
+	public boolean delete(int itemId) {
+		String sql = "UPDATE item SET is_deleted = true WHERE id = ?";
+
+		try (Connection conn = DbConnectionFactory.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setInt(1, itemId);
+			int rowsAffected = stmt.executeUpdate();
+
+			return rowsAffected > 0;
+
+		} catch (SQLException e) {
+			return false;
+		}
 	}
 
 }

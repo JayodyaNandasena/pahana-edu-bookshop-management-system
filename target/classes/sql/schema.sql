@@ -16,6 +16,7 @@ CREATE TABLE item (
     unit_price DECIMAL(12,2) NOT NULL,
     quantity_available INT NOT NULL DEFAULT 0,
     category_id BIGINT NOT NULL,
+    is_deleted BOOL NOT NULL DEFAULT 0,
     UNIQUE KEY uq_item_name_category (name, category_id),
     CONSTRAINT fk_item_category FOREIGN KEY (category_id)
         REFERENCES category(id)

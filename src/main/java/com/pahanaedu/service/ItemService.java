@@ -36,4 +36,8 @@ public class ItemService {
 	public List<Item> byIdOrName(String searchTerm) throws SQLException {
 		return itemDao.byIdOrName(searchTerm);
 	}
+
+	public boolean delete(int itemId) {
+		return itemDao.delete(itemId);
+	}
 }
