@@ -28,4 +28,23 @@ public class Validator {
 		}
 		return false;
 	}
+	
+	public static boolean isValidCustomerIdOrPhone(String input) {
+		if (input == null || input.trim().isEmpty()) {
+			return false;
+		}
+		input = input.trim();
+
+		try {
+			long customerId = Long.parseLong(input);
+			if (customerId > 0) {
+				return true;
+			}
+		} catch (NumberFormatException e) {
+			// Not a valid long number, try phone number
+		}
+
+		// Check if it's a valid phone number
+		return isValidPhoneNumber(input);
+	}
 }

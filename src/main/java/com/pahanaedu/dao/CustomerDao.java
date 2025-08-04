@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,8 +124,8 @@ public class CustomerDao {
 	                        Bill bill = new Bill();
 	                        bill.setId(billObj.getInt("bill_id"));
 	                        bill.setTotal(billObj.getDouble("total"));
-	                        bill.setDate(billObj.getString("date"));
-	                        bill.setTime(billObj.getString("time"));
+	                        bill.setDate(LocalDate.parse(billObj.getString("date")));
+	                        bill.setTime(LocalTime.parse(billObj.getString("time")));
 	                        bill.setCustomer(null);
 	                        bills.add(bill);
 	                    }

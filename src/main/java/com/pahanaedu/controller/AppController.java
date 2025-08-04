@@ -2,6 +2,7 @@ package com.pahanaedu.controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -14,6 +15,7 @@ import org.apache.tomcat.util.log.SystemLogHandler;
 
 import com.pahanaedu.model.Customer;
 import com.pahanaedu.service.CustomerService;
+import com.pahanaedu.util.Validator;
 
 @WebServlet(urlPatterns = { "/", "/bill", "/customers", "/dashboard", "/inventory" })
 public class AppController extends HttpServlet {
@@ -66,12 +68,24 @@ public class AppController extends HttpServlet {
 	}
 
 	private void handleCustomersPage(HttpServletRequest request) {
+		HashMap<String, String> errors = new HashMap<>();
+		
 		try {
 			Customer customer = null;
 
 			String searchParam = request.getParameter("q");
 
 			if (searchParam != null && !searchParam.isEmpty()) {
+				// Validate username
+			    if (!Validator.isValidCustomerIdOrPhone(searchParam)) {
+			        errors.put("qError", "Input must be a valid customer ID or a phone number starting with 070–078.");
+			    }
+			    
+			    if (!errors.isEmpty()) {
+			        request.setAttribute("errors", errors);
+			        return;
+			    }
+			    
 				customer = CustomerService.getInstance().byIdOrPhone(searchParam);
 				request.setAttribute("customer", customer);
 			}

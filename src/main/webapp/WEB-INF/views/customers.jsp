@@ -1,11 +1,23 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ page import="java.util.Map"%>
 
 <link rel="stylesheet" type="text/css"
 	href="/bookshopManagement/assets/css/customers.css">
 
 <%@ include file="/WEB-INF/views/common/header.jsp"%>
 <%@ include file="/WEB-INF/views/common/sidebar.jsp"%>
+
+<!-- Set scoped EL variables for cleaner logic -->
+<c:set var="hasCustomer"
+	value="${customer != null || not empty customer}" />
+<c:set var="hasEmptyBills"
+	value="${customer != null && empty customer.bills}" />
+
+<%
+Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
+%>
 
 <div class="ml-64 p-8">
 	<div class="max-w-7xl mx-auto">
@@ -27,12 +39,20 @@
 					Enter customer ID or mobile number and click search </label>
 				<div class="flex gap-3">
 					<input type="text" name="q" value="${param.q}"
-						placeholder="e.g., CUS0001 or 0700000000" class="px-4 py-2"
-						id="itemSearch" required>
+						placeholder="e.g., CUS0001 or 0700000000"
+						class="px-4 py-2 <%= (errors != null && errors.get("qError") != null) ? "border-red-500" : "border-gray-300 focus:ring-blue-500 focus:border-blue-500" %>"
+						id="itemSearch" required />
 					<button type="submit"
 						class="bg-blue-300 text-black font-semibold px-6 rounded-lg hover:bg-blue-400">
 						Search</button>
 				</div>
+				<%
+				if (errors != null && errors.get("qError") != null) {
+				%>
+				<p class="text-red-500 text-sm mt-1 ml-1"><%=errors.get("qError")%></p>
+				<%
+				}
+				%>
 			</form>
 		</div>
 
@@ -46,7 +66,7 @@
 					<h2 class="text-xl font-semibold">Customer Details</h2>
 				</div>
 				<div class="flex space-x-2">
-					<c:if test="${customer != null}">
+					<c:if test="${hasCustomer}">
 						<c:choose>
 							<c:when test="${customer.isActive}">
 								<span class="status-badge status-active">Active</span>
@@ -58,84 +78,92 @@
 					</c:if>
 				</div>
 			</div>
-			<div class="pt-4">
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-					<!-- Customer ID -->
-					<div>
-						<label for="customer-id"
-							class="block text-sm font-medium text-gray-700 mb-1">Customer
-							ID</label> <input id="customer-id" type="text" value="${customer.id}"
-							class="px-4 py-2" readonly disabled />
+
+			<c:if test="${hasCustomer}">
+				<div class="pt-4">
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+						<!-- Customer ID -->
+						<div>
+							<label for="customer-id"
+								class="block text-sm font-medium text-gray-700 mb-1">Customer
+								ID</label> <input id="customer-id" type="text" value="${customer.id}"
+								class="px-4 py-2" readonly disabled />
+						</div>
+
+						<!-- Total Units Consumed -->
+						<div>
+							<label for="units"
+								class="block text-sm font-medium text-gray-700 mb-1">Total
+								Units Consumed</label> <input id="units" type="text"
+								value="${customer.unitsConsumed}" class="px-4 py-2" readonly
+								disabled />
+						</div>
+
+						<!-- First Name -->
+						<div>
+							<label for="first-name"
+								class="block text-sm font-medium text-gray-700 mb-1">First
+								Name</label> <input id="first-name" type="text" class="px-4 py-2"
+								value="${customer.firstName}" />
+						</div>
+
+						<!-- Last Name -->
+						<div>
+							<label for="last-name"
+								class="block text-sm font-medium text-gray-700 mb-1">Last
+								Name</label> <input id="last-name" type="text" class="px-4 py-2"
+								value="${customer.lastName}" />
+						</div>
+
+						<!-- Mobile Number -->
+						<div>
+							<label for="mobile"
+								class="block text-sm font-medium text-gray-700 mb-1">Mobile
+								Number</label> <input id="mobile" type="text" class="px-4 py-2"
+								value="${customer.phone}" />
+						</div>
+
+						<!-- Email -->
+						<div>
+							<label for="email"
+								class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+							<input id="email" type="email" class="px-4 py-2"
+								value="${customer.email}" />
+						</div>
+
+						<!-- Home Address -->
+						<div class="md:col-span-2">
+							<label for="address"
+								class="block text-sm font-medium text-gray-700 mb-1">Home
+								Address</label>
+							<textarea id="address" rows="3" class="px-4 py-2">${customer.address}</textarea>
+						</div>
 					</div>
 
-					<!-- Total Units Consumed -->
-					<div>
-						<label for="units"
-							class="block text-sm font-medium text-gray-700 mb-1">Total
-							Units Consumed</label> <input id="units" type="text"
-							value="${customer.unitsConsumed}" class="px-4 py-2" readonly
-							disabled />
-					</div>
-
-					<!-- First Name -->
-					<div>
-						<label for="first-name"
-							class="block text-sm font-medium text-gray-700 mb-1">First
-							Name</label> <input id="first-name" type="text" class="px-4 py-2"
-							value="${customer.firstName}" />
-					</div>
-
-					<!-- Last Name -->
-					<div>
-						<label for="last-name"
-							class="block text-sm font-medium text-gray-700 mb-1">Last
-							Name</label> <input id="last-name" type="text" class="px-4 py-2"
-							value="${customer.lastName}" />
-					</div>
-
-					<!-- Mobile Number -->
-					<div>
-						<label for="mobile"
-							class="block text-sm font-medium text-gray-700 mb-1">Mobile
-							Number</label> <input id="mobile" type="text" class="px-4 py-2"
-							value="${customer.phone}" />
-					</div>
-
-					<!-- Email -->
-					<div>
-						<label for="email"
-							class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-						<input id="email" type="email" class="px-4 py-2"
-							value="${customer.email}" />
-					</div>
-
-					<!-- Home Address -->
-					<div class="md:col-span-2">
-						<label for="address"
-							class="block text-sm font-medium text-gray-700 mb-1">Home
-							Address</label>
-						<textarea id="address" rows="3" class="px-4 py-2">${customer.address}</textarea>
+					<!-- Action Buttons-->
+					<div class="flex justify-between pt-6 border-t-2 border-gray-100">
+						<div class="flex space-x-3">
+							<button
+								class="px-8 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+								<i class="fas fa-undo"></i> <span>Reset</span>
+							</button>
+							<button
+								class="px-8 py-3 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+								<i class="fas fa-ban"></i> <span>Deactivate</span>
+							</button>
+						</div>
+						<button
+							class="bg-green-100 hover:bg-green-200 text-green-800 px-12 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+							<i class="fas fa-save"></i> <span>Save Changes</span>
+						</button>
 					</div>
 				</div>
+			</c:if>
 
-				<!-- Action Buttons-->
-				<div class="flex justify-between pt-6 border-t-2 border-gray-100">
-					<div class="flex space-x-3">
-						<button
-							class="px-8 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
-							<i class="fas fa-undo"></i> <span>Reset</span>
-						</button>
-						<button
-							class="px-8 py-3 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
-							<i class="fas fa-ban"></i> <span>Deactivate</span>
-						</button>
-					</div>
-					<button
-						class="bg-green-100 hover:bg-green-200 text-green-800 px-12 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
-						<i class="fas fa-save"></i> <span>Save Changes</span>
-					</button>
-				</div>
-			</div>
+			<!-- Empty Customer State -->
+			<c:if test="${not hasCustomer}">
+				<%@ include file="/WEB-INF/views/common/empty-customer-state.jsp"%>
+			</c:if>
 		</div>
 
 		<!-- Invoice list -->
@@ -165,7 +193,7 @@
 
 					<!-- Items List -->
 					<div id="itemsList" class="divide-y divide-gray-100">
-						<c:if test="${customer != null && not empty customer.bills}">
+						<c:if test="${not hasEmptyBills}">
 							<c:forEach var="bill" items="${customer.bills}">
 								<div
 									class="grid grid-cols-9 px-3 py-4 text-gray-700 hover:bg-gray-50 transition-colors duration-150">
@@ -173,7 +201,10 @@
 									<div class="text-center col-span-2">${bill.date}</div>
 									<div class="text-center col-span-2">${bill.time}</div>
 									<div
-										class="text-center text-green-600 font-semibold col-span-2">${bill.total}</div>
+										class="text-center text-green-600 font-semibold col-span-2">
+										<fmt:formatNumber value="${bill.total}" type="number"
+											minFractionDigits="2" maxFractionDigits="2" />
+									</div>
 									<div class="text-center">
 										<i
 											class="fa fa-angle-right text-gray-400 hover:text-gray-600 cursor-pointer"
@@ -185,7 +216,7 @@
 					</div>
 
 					<!-- Empty Bill State -->
-					<c:if test="${customer != null && empty customer.bills}">
+					<c:if test="${hasEmptyBills}">
 						<div id="emptyState" class="p-8 text-center text-gray-500">
 							<i class="fas fa-shopping-cart text-4xl mb-4 text-gray-300"></i>
 							<p class="text-lg font-medium">No bills added yet</p>
@@ -194,15 +225,10 @@
 							</a>
 						</div>
 					</c:if>
-					
+
 					<!-- Empty Customer State -->
-					<c:if test="${customer = null || empty customer}">
-						<div id="emptyState" class="p-8 text-center text-gray-500">
-							<i class="fa-solid fa-users-slash text-4xl mb-4 text-gray-300"></i>
-							<p class="text-lg font-medium">No Customer Found</p>
-							<p class="text-sm text-gray-400 text-add-bill"
-								data-dialog-open="new-customer-modal">Add New Customer</p>
-						</div>
+					<c:if test="${not hasCustomer}">
+						<%@ include file="/WEB-INF/views/common/empty-customer-state.jsp"%>
 					</c:if>
 				</div>
 			</div>

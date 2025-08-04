@@ -1,9 +1,12 @@
 package com.pahanaedu.model;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 public class Bill {
-	private int id;
-	private String date;
-	private String time;
+	private long id;
+	private LocalDate date;
+	private LocalTime time;
 	private double total;
 	private Customer customer;
 	private User cashier;
@@ -11,8 +14,7 @@ public class Bill {
 	public Bill() {
 	}
 
-	public Bill(int id, String date, String time, double total, Customer customer, User cashier) {
-		super();
+	public Bill(long id, LocalDate date, LocalTime time, double total, Customer customer, User cashier) {
 		this.id = id;
 		this.date = date;
 		this.time = time;
@@ -21,27 +23,27 @@ public class Bill {
 		this.cashier = cashier;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
-	public String getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 
-	public void setDate(String date) {
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 
-	public String getTime() {
+	public LocalTime getTime() {
 		return time;
 	}
 
-	public void setTime(String time) {
+	public void setTime(LocalTime time) {
 		this.time = time;
 	}
 
@@ -68,5 +70,4 @@ public class Bill {
 	public void setCashier(User cashier) {
 		this.cashier = cashier;
 	}
-
 }
