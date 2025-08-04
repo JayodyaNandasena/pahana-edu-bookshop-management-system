@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <link rel="stylesheet" type="text/css"
 	href="/bookshopManagement/assets/css/bill.css">
@@ -32,33 +33,40 @@
 						</button>
 					</div>
 					<div class="p-6 pt-3 pb-6">
+					<form method="POST" action="${pageContext.request.contextPath}/customer?action=searchByMobile">
 						<div class="mb-6">
 							<label for="customerSearch"
 								class="block text-sm font-medium text-gray-700 mb-2">Search
 								Customer</label>
 							<div class="relative">
-								<input type="text"
+								<input type="text" name="mobile"
+									value="${mobile != null ? mobile : ''}"
 									placeholder="Enter mobile number (e.g., 0700000000)"
 									class="px-4 py-3" id="customerSearch">
 								<button
+									type="submit"
 									class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-500 hover:text-blue-700 p-2">
 									<i class="fas fa-search"></i>
 								</button>
 							</div>
+							<c:if test="${not empty errorMessage}">
+								<p class="text-red-500 text-sm mt-1 ml-1">${errorMessage}</p>
+							</c:if>
 						</div>
 
 						<div class="grid grid-cols-2 gap-4 mb-6">
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-2">Customer
-									ID</label> <input type="text" value="" class="px-4 py-3" readonly
+									ID</label> <input type="text" value="${customer != null ? customer.id : ''}" class="px-4 py-3" readonly
 									disabled />
 							</div>
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-2">Customer
-									Name</label> <input type="text" value="" class="px-4 py-3" readonly
+									Name</label> <input type="text" value="${customer != null ? customer.firstName.concat(' ').concat(customer.lastName) : ''}" class="px-4 py-3" readonly
 									disabled>
 							</div>
 						</div>
+						</form>
 
 						<div class="flex">
 							<button
