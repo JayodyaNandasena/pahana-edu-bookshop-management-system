@@ -233,10 +233,17 @@ Map<String, String> errors = (Map<String, String>) request.getAttribute("errors"
 				</div>
 			</div>
 
-			<div class="flex justify-between items-center mt-8 px-2">
+			<div class="flex justify-between items-center mt-6 px-2">
 				<div>
-					<span class="text-sm text-gray-600">Showing 1-2 of 2
-						invoices</span>
+					<c:choose>
+						<c:when test="${hasEmptyBills}">
+							<span class="text-sm text-gray-600">No Items Found</span>
+						</c:when>
+						<c:otherwise>
+							<span class="text-sm text-gray-600"> Showing 1 -
+								${customer.bills.size()} of ${customer.bills.size()} items </span>
+						</c:otherwise>
+					</c:choose>
 					<p class="text-xs text-gray-400 mt-1">Last updated: Today</p>
 				</div>
 				<div class="flex items-center space-x-3">
