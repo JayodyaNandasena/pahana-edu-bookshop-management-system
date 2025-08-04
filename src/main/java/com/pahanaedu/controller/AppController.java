@@ -10,8 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.tomcat.util.log.SystemLogHandler;
+import javax.servlet.http.HttpSession;
 
 import com.pahanaedu.model.Customer;
 import com.pahanaedu.service.CustomerService;
@@ -68,29 +67,36 @@ public class AppController extends HttpServlet {
 	}
 
 	private void handleCustomersPage(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+
+		// Move errors from session to request
+		Object errorsObj = session.getAttribute("errors");
+		if (errorsObj != null) {
+			request.setAttribute("errors", errorsObj);
+			session.removeAttribute("errors");
+		}
+
+		// Move preserved form data to request
+		Object formData = session.getAttribute("formData");
+		if (formData != null) {
+			request.setAttribute("formData", formData);
+			session.removeAttribute("formData");
+		}
+
+		// Always try to fetch customer from DB if `q` exists
 		HashMap<String, String> errors = new HashMap<>();
-		
 		try {
-			Customer customer = null;
-
 			String searchParam = request.getParameter("q");
-
 			if (searchParam != null && !searchParam.isEmpty()) {
-				// Validate username
-			    if (!Validator.isValidCustomerIdOrPhone(searchParam)) {
-			        errors.put("qError", "Input must be a valid customer ID or a phone number starting with 070–078.");
-			    }
-			    
-			    if (!errors.isEmpty()) {
-			        request.setAttribute("errors", errors);
-			        return;
-			    }
-			    
-				customer = CustomerService.getInstance().byIdOrPhone(searchParam);
+				if (!Validator.isValidCustomerIdOrPhone(searchParam)) {
+					errors.put("qError", "Input must be a valid customer ID or a phone number starting with 070–078.");
+					request.setAttribute("errors", errors);
+					return;
+				}
+
+				Customer customer = CustomerService.getInstance().byIdOrPhone(searchParam);
 				request.setAttribute("customer", customer);
 			}
-			
-			return;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			request.setAttribute("error", "Unable to search customer.");

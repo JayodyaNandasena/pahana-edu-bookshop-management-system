@@ -38,10 +38,15 @@ public class CustomerService {
 	}
 
 	public boolean deactivate(String id) {
-		return customerDao.deactivate(id);		
+		return customerDao.deactivate(id);
 	}
-	
+
 	public boolean activate(String id) {
-		return customerDao.activate(id);		
+		return customerDao.activate(id);
+	}
+
+	public PersistResult update(String id, String firstName, String lastName, String phone, String email,
+			String address) {
+		return customerDao.update(id, firstName, lastName, phone, email, address);
 	}
 }

@@ -152,7 +152,7 @@ public class CustomerDao {
 			return false;
 		}
 	}
-	
+
 	public boolean activate(String id) {
 		String sql = "UPDATE customer SET is_active = true WHERE id = ?";
 
@@ -168,4 +168,33 @@ public class CustomerDao {
 		}
 	}
 
+	public PersistResult update(String id, String firstName, String lastName, String phone, String email,
+			String address) {
+		String sql = "UPDATE customer SET first_name = ?, last_name = ?, phone = ?, email = ?, address = ? WHERE id = ?";
+
+		try (Connection conn = DbConnectionFactory.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setString(1, firstName);
+			stmt.setString(2, lastName);
+			stmt.setString(3, phone);
+			stmt.setString(4, email);
+			stmt.setString(5, address);
+			stmt.setString(6, id);
+
+			int rowsAffected = stmt.executeUpdate();
+			return rowsAffected > 0 ? PersistResult.SUCCESS : PersistResult.OTHER_ERROR;
+
+		} catch (SQLException e) {
+			if (isUniqueConstraintViolation(e)) {
+				String message = e.getMessage().toLowerCase();
+				if (message.contains("email")) {
+					return PersistResult.EMAIL_EXISTS;
+				}
+				return PersistResult.PHONE_EXISTS;
+			}
+			System.err.println("Database error: " + e.getMessage());
+			return PersistResult.OTHER_ERROR;
+		}
+	}
 }

@@ -3,6 +3,7 @@ package com.pahanaedu.controller;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -58,7 +59,7 @@ public class CustomerController extends HttpServlet {
 			handleDeactivate(request, response);
 			return;
 		}
-		
+
 		if ("activate".equals(action)) {
 			handleActivate(request, response);
 			return;
@@ -84,19 +85,19 @@ public class CustomerController extends HttpServlet {
 
 	private void handleDeactivate(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String id = request.getParameter("id");
-		
+
 		customerService.deactivate(id);
-		
+
 		response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
 
 		return;
 	}
-	
+
 	private void handleActivate(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String id = request.getParameter("id");
-		
+
 		customerService.activate(id);
-		
+
 		response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
 
 		return;
@@ -109,18 +110,51 @@ public class CustomerController extends HttpServlet {
 		String phone = request.getParameter("phone");
 		String email = request.getParameter("email");
 		String address = request.getParameter("address");
-		
+
 		HashMap<String, String> errors = validateInputs(firstName, lastName, phone, email, address);
 
-		// If there are validation errors, send them back to the source form
+		// Preserve customer data in a map
+		Map<String, String> customerFormData = new HashMap<>();
+		customerFormData.put("first_name", firstName);
+		customerFormData.put("last_name", lastName);
+		customerFormData.put("phone", phone);
+		customerFormData.put("email", email);
+		customerFormData.put("address", address);
+
+		HttpSession session = request.getSession();
+
+		// If validation errors exist, redirect back
 		if (!errors.isEmpty()) {
-			HttpSession session = request.getSession();
-		    session.setAttribute("errors", errors);
-		    preserveFormData(request, firstName, lastName, phone, email, address);
-		    response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
-		    return;
+			session.setAttribute("errors", errors);
+			session.setAttribute("formData", customerFormData);
+			response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
+			return;
 		}
 
+		// Attempt update
+		PersistResult result = customerService.update(id, firstName, lastName, phone, email, address);
+
+		switch (result) {
+		case SUCCESS:
+			response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
+			return;
+		case EMAIL_EXISTS:
+			errors.put("emailError", "Email already exists.");
+			break;
+		case PHONE_EXISTS:
+			errors.put("phoneError", "Mobile number already exists.");
+			break;
+		case OTHER_ERROR:
+			errors.put("generalError", "Failed to update customer. Please try again.");
+			break;
+		default:
+			throw new IllegalArgumentException("Unexpected result: " + result);
+		}
+
+		// On update error, set errors and form data in session and redirect
+		session.setAttribute("errors", errors);
+		session.setAttribute("customer", customerFormData);
+		response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
 	}
 
 	private void handleSearchByMobile(String mobile, HttpServletRequest request, HttpServletResponse response)
@@ -157,7 +191,6 @@ public class CustomerController extends HttpServlet {
 
 		try {
 			PersistResult result = customerService.persist(firstName, lastName, phone, email, address);
-			System.out.println("result : " + result);
 			switch (result) {
 			case SUCCESS:
 				response.sendRedirect(request.getContextPath() + sourcePage);
