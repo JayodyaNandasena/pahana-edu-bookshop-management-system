@@ -3,6 +3,7 @@ package com.pahanaedu.controller;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -15,6 +16,11 @@ import javax.servlet.http.HttpSession;
 import com.pahanaedu.model.Customer;
 import com.pahanaedu.service.CustomerService;
 import com.pahanaedu.util.Validator;
+
+import com.pahanaedu.model.Category;
+import com.pahanaedu.model.Item;
+import com.pahanaedu.service.CategoryService;
+import com.pahanaedu.service.ItemService;
 
 @WebServlet(urlPatterns = { "/", "/bill", "/customers", "/dashboard", "/inventory" })
 public class AppController extends HttpServlet {
@@ -52,8 +58,9 @@ public class AppController extends HttpServlet {
 			request.setAttribute("activePage", "dashboard");
 			break;
 		case "/inventory":
-			targetPage = "/WEB-INF/views/inventory.jsp";
+			handleInventoryPage(request);
 			request.setAttribute("activePage", "inventory");
+			targetPage = "/WEB-INF/views/inventory.jsp";
 			break;
 		default:
 			targetPage = "/WEB-INF/views/404.jsp";
@@ -100,6 +107,53 @@ public class AppController extends HttpServlet {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			request.setAttribute("error", "Unable to search customer.");
+		}
+	}
+	
+	private void handleInventoryPage(HttpServletRequest request) {
+		try {
+			List<Category> categories = CategoryService.getInstance().all();
+			List<Item> items;
+			
+			String categoryIdParam = request.getParameter("category");
+			String searchParam = request.getParameter("search");			
+
+			Integer selectedCategoryId = null;
+
+			if (categoryIdParam != null && !categoryIdParam.isEmpty()) {
+			    try {
+			        int categoryId = Integer.parseInt(categoryIdParam);
+
+			        // Check if this ID exists in the category list
+			        boolean categoryExists = categories.stream()
+			            .anyMatch(c -> c.getId() == categoryId);
+
+			        if (categoryExists) {
+			            selectedCategoryId = categoryId;
+			            items = ItemService.getInstance().byCategory(categoryId);
+			        } else {
+			            // Invalid category
+			            items = ItemService.getInstance().all();
+			        }
+
+			    } catch (NumberFormatException e) {
+			        // Invalid input
+			        items = ItemService.getInstance().all();
+			    }
+			} else if (searchParam != null && !searchParam.isEmpty()){
+				items = ItemService.getInstance().byIdOrName(searchParam);
+				selectedCategoryId = -1;
+			} else {
+			    // No category selected
+			    items = ItemService.getInstance().all();
+			}			
+
+			request.setAttribute("items", items);
+			request.setAttribute("categories", categories);
+			request.setAttribute("selectedCategoryId", selectedCategoryId);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			request.setAttribute("error", "Unable to load items.");
 		}
 	}
 }
