@@ -80,84 +80,134 @@ Map<String, String> errors = (Map<String, String>) request.getAttribute("errors"
 			</div>
 
 			<c:if test="${hasCustomer}">
-				<div class="pt-4">
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-						<!-- Customer ID -->
-						<div>
-							<label for="customer-id"
-								class="block text-sm font-medium text-gray-700 mb-1">Customer
-								ID</label> <input id="customer-id" type="text" value="${customer.id}"
-								class="px-4 py-2" readonly disabled />
+				<form action="customer" method="post" class="pt-4">
+					<div class="pt-4">
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+							<input type="hidden" name="id" value="${customer.id}" />
+
+							<!-- Customer ID -->
+							<div>
+								<label for="customer-id"
+									class="block text-sm font-medium text-gray-700 mb-1">Customer
+									ID </label> <input id="customer-id" type="text" value="${customer.id}"
+									class="px-4 py-2" readonly disabled />
+							</div>
+
+							<!-- Total Units Consumed -->
+							<div>
+								<label for="units"
+									class="block text-sm font-medium text-gray-700 mb-1">Total
+									Units Consumed</label> <input id="units" name="unitsConsumed"
+									type="text" value="${customer.unitsConsumed}" class="px-4 py-2"
+									readonly disabled />
+							</div>
+
+							<!-- First Name -->
+							<div>
+								<label for="first-name"
+									class="block text-sm font-medium text-gray-700 mb-1">First
+									Name</label> <input id="first-name" name="first_name" type="text"
+									class="px-4 py-2" value="${customer.firstName}" />
+								<%
+								if (errors != null && errors.get("firstNameError") != null) {
+								%>
+								<p class="text-red-500 text-sm mt-1 ml-1"><%=errors.get("firstNameError")%></p>
+								<%
+								}
+								%>
+							</div>
+
+							<!-- Last Name -->
+							<div>
+								<label for="last-name"
+									class="block text-sm font-medium text-gray-700 mb-1">Last
+									Name</label> <input id="last-name" name="last_name" type="text"
+									class="px-4 py-2" value="${customer.lastName}" />
+								<%
+								if (errors != null && errors.get("lastNameError") != null) {
+								%>
+								<p class="text-red-500 text-sm mt-1 ml-1"><%=errors.get("lastNameError")%></p>
+								<%
+								}
+								%>
+							</div>
+
+							<!-- Mobile Number -->
+							<div>
+								<label for="mobile"
+									class="block text-sm font-medium text-gray-700 mb-1">Mobile
+									Number</label> <input id="mobile" name="phone" type="text"
+									class="px-4 py-2" value="${customer.phone}" />
+								<%
+								if (errors != null && errors.get("phoneError") != null) {
+								%>
+								<p class="text-red-500 text-sm mt-1 ml-1"><%=errors.get("phoneError")%></p>
+								<%
+								}
+								%>
+							</div>
+
+							<!-- Email -->
+							<div>
+								<label for="email"
+									class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+								<input id="email" name="email" type="email" class="px-4 py-2"
+									value="${customer.email}" />
+								<%
+								if (errors != null && errors.get("emailError") != null) {
+								%>
+								<p class="text-red-500 text-sm mt-1 ml-1"><%=errors.get("emailError")%></p>
+								<%
+								}
+								%>
+							</div>
+
+							<!-- Home Address -->
+							<div class="md:col-span-2">
+								<label for="address"
+									class="block text-sm font-medium text-gray-700 mb-1">Home
+									Address</label>
+								<textarea id="address" name="address" rows="3" class="px-4 py-2">${customer.address}</textarea>
+								<%
+								if (errors != null && errors.get("addressError") != null) {
+								%>
+								<p class="text-red-500 text-sm mt-1 ml-1"><%=errors.get("addressError")%></p>
+								<%
+								}
+								%>
+							</div>
 						</div>
 
-						<!-- Total Units Consumed -->
-						<div>
-							<label for="units"
-								class="block text-sm font-medium text-gray-700 mb-1">Total
-								Units Consumed</label> <input id="units" type="text"
-								value="${customer.unitsConsumed}" class="px-4 py-2" readonly
-								disabled />
-						</div>
+						<!-- Action Buttons-->
+						<div class="flex justify-between pt-6 border-t-2 border-gray-100">
+							<div class="flex space-x-3">
+								<a href="<c:url value='/customers?q=${customer.id}' />"
+									class="px-8 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+									<i class="fas fa-undo"></i> <span>Reset</span>
+								</a>
 
-						<!-- First Name -->
-						<div>
-							<label for="first-name"
-								class="block text-sm font-medium text-gray-700 mb-1">First
-								Name</label> <input id="first-name" type="text" class="px-4 py-2"
-								value="${customer.firstName}" />
-						</div>
-
-						<!-- Last Name -->
-						<div>
-							<label for="last-name"
-								class="block text-sm font-medium text-gray-700 mb-1">Last
-								Name</label> <input id="last-name" type="text" class="px-4 py-2"
-								value="${customer.lastName}" />
-						</div>
-
-						<!-- Mobile Number -->
-						<div>
-							<label for="mobile"
-								class="block text-sm font-medium text-gray-700 mb-1">Mobile
-								Number</label> <input id="mobile" type="text" class="px-4 py-2"
-								value="${customer.phone}" />
-						</div>
-
-						<!-- Email -->
-						<div>
-							<label for="email"
-								class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-							<input id="email" type="email" class="px-4 py-2"
-								value="${customer.email}" />
-						</div>
-
-						<!-- Home Address -->
-						<div class="md:col-span-2">
-							<label for="address"
-								class="block text-sm font-medium text-gray-700 mb-1">Home
-								Address</label>
-							<textarea id="address" rows="3" class="px-4 py-2">${customer.address}</textarea>
+								<c:choose>
+									<c:when test="${customer.isActive}">
+										<button type="submit" name="action" value="deactivate"
+											class="px-8 py-3 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+											<i class="fas fa-ban"></i> <span>Deactivate</span>
+										</button>
+									</c:when>
+									<c:otherwise>
+										<button type="submit" name="action" value="activate"
+											class="px-8 py-3 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+											<i class="fa-solid fa-circle-up"></i> <span>Activate</span>
+										</button>
+									</c:otherwise>
+								</c:choose>
+							</div>
+							<button type="submit" name="action" value="update"
+								class="bg-green-100 hover:bg-green-200 text-green-800 px-12 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+								<i class="fas fa-save"></i> <span>Save Changes</span>
+							</button>
 						</div>
 					</div>
-
-					<!-- Action Buttons-->
-					<div class="flex justify-between pt-6 border-t-2 border-gray-100">
-						<div class="flex space-x-3">
-							<button
-								class="px-8 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
-								<i class="fas fa-undo"></i> <span>Reset</span>
-							</button>
-							<button
-								class="px-8 py-3 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
-								<i class="fas fa-ban"></i> <span>Deactivate</span>
-							</button>
-						</div>
-						<button
-							class="bg-green-100 hover:bg-green-200 text-green-800 px-12 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
-							<i class="fas fa-save"></i> <span>Save Changes</span>
-						</button>
-					</div>
-				</div>
+				</form>
 			</c:if>
 
 			<!-- Empty Customer State -->

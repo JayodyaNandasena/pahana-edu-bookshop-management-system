@@ -36,4 +36,12 @@ public class CustomerService {
 	public Customer byIdOrPhone(String searchTerm) throws SQLException {
 		return customerDao.byIdOrPhone(searchTerm);
 	}
+
+	public boolean deactivate(String id) {
+		return customerDao.deactivate(id);		
+	}
+	
+	public boolean activate(String id) {
+		return customerDao.activate(id);		
+	}
 }

@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.pahanaedu.model.Customer;
 import com.pahanaedu.model.enums.PersistResult;
@@ -40,7 +41,7 @@ public class CustomerController extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String action = request.getParameter("action");
-		
+
 		if ("searchByMobile".equals(action)) {
 			String mobile = request.getParameter("mobile");
 			request.setAttribute("mobile", mobile);
@@ -48,7 +49,19 @@ public class CustomerController extends HttpServlet {
 			return;
 		}
 
-		if ("getCustomerDetails".equals(action)) {
+		if ("update".equals(action)) {
+			handleUpdate(request, response);
+			return;
+		}
+
+		if ("deactivate".equals(action)) {
+			handleDeactivate(request, response);
+			return;
+		}
+		
+		if ("activate".equals(action)) {
+			handleActivate(request, response);
+			return;
 		}
 
 		String firstName = request.getParameter("first_name");
@@ -67,6 +80,47 @@ public class CustomerController extends HttpServlet {
 			request.setAttribute("errorMessage", "An unexpected error occurred.");
 			request.getRequestDispatcher(sourcePage).forward(request, response);
 		}
+	}
+
+	private void handleDeactivate(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String id = request.getParameter("id");
+		
+		customerService.deactivate(id);
+		
+		response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
+
+		return;
+	}
+	
+	private void handleActivate(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String id = request.getParameter("id");
+		
+		customerService.activate(id);
+		
+		response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
+
+		return;
+	}
+
+	private void handleUpdate(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String id = request.getParameter("id");
+		String firstName = request.getParameter("first_name");
+		String lastName = request.getParameter("last_name");
+		String phone = request.getParameter("phone");
+		String email = request.getParameter("email");
+		String address = request.getParameter("address");
+		
+		HashMap<String, String> errors = validateInputs(firstName, lastName, phone, email, address);
+
+		// If there are validation errors, send them back to the source form
+		if (!errors.isEmpty()) {
+			HttpSession session = request.getSession();
+		    session.setAttribute("errors", errors);
+		    preserveFormData(request, firstName, lastName, phone, email, address);
+		    response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
+		    return;
+		}
+
 	}
 
 	private void handleSearchByMobile(String mobile, HttpServletRequest request, HttpServletResponse response)
@@ -89,24 +143,7 @@ public class CustomerController extends HttpServlet {
 	private void handleCustomerCreate(String firstName, String lastName, String phone, String email, String address,
 			HttpServletRequest request, HttpServletResponse response, String sourcePage)
 			throws IOException, ServletException {
-		HashMap<String, String> errors = new HashMap<>();
-
-		// Validate inputs
-		if (!Validator.isValidString(firstName, 1, 100)) {
-			errors.put("firstNameError", "First name must be between 1 and 100 characters.");
-		}
-		if (!Validator.isValidString(lastName, 1, 100)) {
-			errors.put("lastNameError", "Last name must be between 1 and 100 characters.");
-		}
-		if (!Validator.isValidPhoneNumber(phone)) {
-			errors.put("phoneError", "Phone number must be a valid Sri Lankan mobile number (e.g., 0771234567).");
-		}
-		if (!Validator.isValidEmail(email)) {
-			errors.put("emailError", "Please enter a valid email address (e.g., name@example.com).");
-		}
-		if (!Validator.isValidString(address, 1, 250)) {
-			errors.put("addressError", "Address must be between 1 and 250 characters.");
-		}
+		HashMap<String, String> errors = validateInputs(firstName, lastName, phone, email, address);
 
 		// If there are validation errors, send them back to the source form
 		if (!errors.isEmpty()) {
@@ -177,5 +214,29 @@ public class CustomerController extends HttpServlet {
 		request.setAttribute("phone", phone);
 		request.setAttribute("email", email);
 		request.setAttribute("address", address);
+	}
+
+	private HashMap<String, String> validateInputs(String firstName, String lastName, String phone, String email,
+			String address) {
+		HashMap<String, String> errors = new HashMap<>();
+
+		// Validate inputs
+		if (!Validator.isValidString(firstName, 1, 100)) {
+			errors.put("firstNameError", "First name must be between 1 and 100 characters.");
+		}
+		if (!Validator.isValidString(lastName, 1, 100)) {
+			errors.put("lastNameError", "Last name must be between 1 and 100 characters.");
+		}
+		if (!Validator.isValidPhoneNumber(phone)) {
+			errors.put("phoneError", "Phone number must be a valid Sri Lankan mobile number (e.g., 0771234567).");
+		}
+		if (!Validator.isValidEmail(email)) {
+			errors.put("emailError", "Please enter a valid email address (e.g., name@example.com).");
+		}
+		if (!Validator.isValidString(address, 1, 250)) {
+			errors.put("addressError", "Address must be between 1 and 250 characters.");
+		}
+
+		return errors;
 	}
 }
