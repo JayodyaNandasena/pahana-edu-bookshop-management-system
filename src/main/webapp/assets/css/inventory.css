@@ -1,0 +1,17 @@
+@charset "UTF-8";
+
+.btn-selected {
+	background-color: var(--color-secondary);
+	color: var(--color-text);
+	font-weight: bold;
+}
+
+.btn-selected:hover {
+	cursor: pointer;
+}
+
+.text-add-item:hover {
+	color: var(--color-secondary);
+	text-decoration: underline;
+	cursor: pointer;
+}

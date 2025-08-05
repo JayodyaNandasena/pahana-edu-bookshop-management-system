@@ -1,11 +1,23 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ page import="java.util.Map"%>
 
 <link rel="stylesheet" type="text/css"
 	href="/bookshopManagement/assets/css/customers.css">
 
-<%@ include file="/WEB-INF/pages/common/header.jsp"%>
-<%@ include file="/WEB-INF/pages/common/sidebar.jsp"%>
+<%@ include file="/WEB-INF/views/common/header.jsp"%>
+<%@ include file="/WEB-INF/views/common/sidebar.jsp"%>
+
+<!-- Set scoped EL variables for cleaner logic -->
+<c:set var="hasCustomer"
+	value="${customer != null || not empty customer}" />
+<c:set var="hasEmptyBills"
+	value="${customer != null && empty customer.bills}" />
+
+<%
+Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
+%>
 
 <div class="ml-64 p-8">
 	<div class="max-w-7xl mx-auto">
@@ -22,15 +34,26 @@
 		<!-- Search input-->
 		<div
 			class="sticky top-4 z-50 bg-white rounded-2xl shadow-xl border border-blue-300 overflow-hidden px-6 py-4 my-4">
-			<label for="customerSearch" class="text-lg font-semibold mb-2 block">
-				Enter customer ID or mobile number and click search </label>
-			<div class="flex gap-3">
-				<input type="text" placeholder="e.g., CUS0001 or 0700000000"
-					class="px-4 py-2" id="customerSearch">
-				<button
-					class="bg-blue-300 text-black font-semibold px-6 rounded-lg hover:bg-blue-400">
-					Search</button>
-			</div>
+			<form action="customers" method="get">
+				<label for="q" class="text-lg font-semibold mb-2 block">
+					Enter customer ID or mobile number and click search </label>
+				<div class="flex gap-3">
+					<input type="text" name="q" value="${param.q}"
+						placeholder="e.g., CUS0001 or 0700000000"
+						class="px-4 py-2 <%= (errors != null && errors.get("qError") != null) ? "border-red-500" : "border-gray-300 focus:ring-blue-500 focus:border-blue-500" %>"
+						id="itemSearch" required />
+					<button type="submit"
+						class="bg-blue-300 text-black font-semibold px-6 rounded-lg hover:bg-blue-400">
+						Search</button>
+				</div>
+				<%
+				if (errors != null && errors.get("qError") != null) {
+				%>
+				<p class="text-red-500 text-sm mt-1 ml-1"><%=errors.get("qError")%></p>
+				<%
+				}
+				%>
+			</form>
 		</div>
 
 		<!-- Customer details -->
@@ -43,82 +66,154 @@
 					<h2 class="text-xl font-semibold">Customer Details</h2>
 				</div>
 				<div class="flex space-x-2">
-					<span class="status-badge status-paid">Active</span>
+					<c:if test="${hasCustomer}">
+						<c:choose>
+							<c:when test="${customer.isActive}">
+								<span class="status-badge status-active">Active</span>
+							</c:when>
+							<c:otherwise>
+								<span class="status-badge status-inactive">Inactive</span>
+							</c:otherwise>
+						</c:choose>
+					</c:if>
 				</div>
 			</div>
-			<div class="pt-4">
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-					<!-- Customer ID -->
-					<div>
-						<label for="customer-id"
-							class="block text-sm font-medium text-gray-700 mb-1">Customer
-							ID</label> <input id="customer-id" type="text" value="CUS0002"
-							class="px-4 py-2" readonly disabled />
-					</div>
 
-					<!-- Total Units Consumed -->
-					<div>
-						<label for="units"
-							class="block text-sm font-medium text-gray-700 mb-1">Total
-							Units Consumed</label> <input id="units" type="text" value="50"
-							class="px-4 py-2" readonly disabled />
-					</div>
+			<c:if test="${hasCustomer}">
+				<form action="customer" method="post" class="pt-4">
+					<div class="pt-4">
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+							<input type="hidden" name="id" value="${customer.id}" />
 
-					<!-- First Name -->
-					<div>
-						<label for="first-name"
-							class="block text-sm font-medium text-gray-700 mb-1">First
-							Name</label> <input id="first-name" type="text" class="px-4 py-2" />
-					</div>
+							<!-- Customer ID -->
+							<div>
+								<label for="customer-id"
+									class="block text-sm font-medium text-gray-700 mb-1">Customer
+									ID </label> <input id="customer-id" type="text" value="${customer.id}"
+									class="px-4 py-2" readonly disabled />
+							</div>
 
-					<!-- Last Name -->
-					<div>
-						<label for="last-name"
-							class="block text-sm font-medium text-gray-700 mb-1">Last
-							Name</label> <input id="last-name" type="text" class="px-4 py-2" />
-					</div>
+							<!-- Total Units Consumed -->
+							<div>
+								<label for="units"
+									class="block text-sm font-medium text-gray-700 mb-1">Total
+									Units Consumed</label> <input id="units" name="unitsConsumed"
+									type="text" value="${customer.unitsConsumed}" class="px-4 py-2"
+									readonly disabled />
+							</div>
 
-					<!-- Mobile Number -->
-					<div>
-						<label for="mobile"
-							class="block text-sm font-medium text-gray-700 mb-1">Mobile
-							Number</label> <input id="mobile" type="text" class="px-4 py-2" />
-					</div>
+							<!-- First Name -->
+							<div>
+								<label for="first-name"
+									class="block text-sm font-medium text-gray-700 mb-1">First
+									Name</label> <input id="first-name" name="first_name" type="text"
+									class="px-4 py-2" value="${customer.firstName}" />
+								<%
+								if (errors != null && errors.get("firstNameError") != null) {
+								%>
+								<p class="text-red-500 text-sm mt-1 ml-1"><%=errors.get("firstNameError")%></p>
+								<%
+								}
+								%>
+							</div>
 
-					<!-- Email -->
-					<div>
-						<label for="email"
-							class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-						<input id="email" type="email" class="px-4 py-2" />
-					</div>
+							<!-- Last Name -->
+							<div>
+								<label for="last-name"
+									class="block text-sm font-medium text-gray-700 mb-1">Last
+									Name</label> <input id="last-name" name="last_name" type="text"
+									class="px-4 py-2" value="${customer.lastName}" />
+								<%
+								if (errors != null && errors.get("lastNameError") != null) {
+								%>
+								<p class="text-red-500 text-sm mt-1 ml-1"><%=errors.get("lastNameError")%></p>
+								<%
+								}
+								%>
+							</div>
 
-					<!-- Home Address -->
-					<div class="md:col-span-2">
-						<label for="address"
-							class="block text-sm font-medium text-gray-700 mb-1">Home
-							Address</label>
-						<textarea id="address" rows="3" class="px-4 py-2"></textarea>
-					</div>
-				</div>
+							<!-- Mobile Number -->
+							<div>
+								<label for="mobile"
+									class="block text-sm font-medium text-gray-700 mb-1">Mobile
+									Number</label> <input id="mobile" name="phone" type="text"
+									class="px-4 py-2" value="${customer.phone}" />
+								<%
+								if (errors != null && errors.get("phoneError") != null) {
+								%>
+								<p class="text-red-500 text-sm mt-1 ml-1"><%=errors.get("phoneError")%></p>
+								<%
+								}
+								%>
+							</div>
 
-				<!-- Action Buttons-->
-				<div class="flex justify-between pt-6 border-t-2 border-gray-100">
-					<div class="flex space-x-3">
-						<button
-							class="px-8 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
-							<i class="fas fa-undo"></i> <span>Reset</span>
-						</button>
-						<button
-							class="px-8 py-3 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
-							<i class="fas fa-ban"></i> <span>Deactivate</span>
-						</button>
+							<!-- Email -->
+							<div>
+								<label for="email"
+									class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+								<input id="email" name="email" type="email" class="px-4 py-2"
+									value="${customer.email}" />
+								<%
+								if (errors != null && errors.get("emailError") != null) {
+								%>
+								<p class="text-red-500 text-sm mt-1 ml-1"><%=errors.get("emailError")%></p>
+								<%
+								}
+								%>
+							</div>
+
+							<!-- Home Address -->
+							<div class="md:col-span-2">
+								<label for="address"
+									class="block text-sm font-medium text-gray-700 mb-1">Home
+									Address</label>
+								<textarea id="address" name="address" rows="3" class="px-4 py-2">${customer.address}</textarea>
+								<%
+								if (errors != null && errors.get("addressError") != null) {
+								%>
+								<p class="text-red-500 text-sm mt-1 ml-1"><%=errors.get("addressError")%></p>
+								<%
+								}
+								%>
+							</div>
+						</div>
+
+						<!-- Action Buttons-->
+						<div class="flex justify-between pt-6 border-t-2 border-gray-100">
+							<div class="flex space-x-3">
+								<a href="<c:url value='/customers?q=${customer.id}' />"
+									class="px-8 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+									<i class="fas fa-undo"></i> <span>Reset</span>
+								</a>
+
+								<c:choose>
+									<c:when test="${customer.isActive}">
+										<button type="submit" name="action" value="deactivate"
+											class="px-8 py-3 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+											<i class="fas fa-ban"></i> <span>Deactivate</span>
+										</button>
+									</c:when>
+									<c:otherwise>
+										<button type="submit" name="action" value="activate"
+											class="px-8 py-3 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+											<i class="fa-solid fa-circle-up"></i> <span>Activate</span>
+										</button>
+									</c:otherwise>
+								</c:choose>
+							</div>
+							<button type="submit" name="action" value="update"
+								class="bg-green-100 hover:bg-green-200 text-green-800 px-12 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+								<i class="fas fa-save"></i> <span>Save Changes</span>
+							</button>
+						</div>
 					</div>
-					<button
-						class="bg-green-100 hover:bg-green-200 text-green-800 px-12 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
-						<i class="fas fa-save"></i> <span>Save Changes</span>
-					</button>
-				</div>
-			</div>
+				</form>
+			</c:if>
+
+			<!-- Empty Customer State -->
+			<c:if test="${not hasCustomer}">
+				<%@ include file="/WEB-INF/views/common/empty-customer-state.jsp"%>
+			</c:if>
 		</div>
 
 		<!-- Invoice list -->
@@ -148,47 +243,57 @@
 
 					<!-- Items List -->
 					<div id="itemsList" class="divide-y divide-gray-100">
-						<div
-							class="grid grid-cols-9 px-3 py-4 text-gray-700 hover:bg-gray-50 transition-colors duration-150">
-							<div class="text-center font-medium col-span-2">INV0001</div>
-							<div class="text-center col-span-2">19/07/2025</div>
-							<div class="text-center col-span-2">12:03 PM</div>
-							<div class="text-center text-green-600 font-semibold col-span-2">2500.00</div>
-							<div class="text-center">
-								<i
-									class="fa fa-angle-right text-gray-400 hover:text-gray-600 cursor-pointer"
-									aria-hidden="true"></i>
-							</div>
-						</div>
-						<div
-							class="grid grid-cols-9 px-3 py-4 text-gray-700 hover:bg-gray-50 transition-colors duration-150">
-							<div class="text-center font-medium col-span-2">INV0002</div>
-							<div class="text-center col-span-2">20/07/2025</div>
-							<div class="text-center col-span-2">03:45 PM</div>
-							<div class="text-center text-green-600 font-semibold col-span-2">1800.00</div>
-							<div class="text-center">
-								<i
-									class="fa fa-angle-right text-gray-400 hover:text-gray-600 cursor-pointer"
-									aria-hidden="true"></i>
-							</div>
-						</div>
+						<c:if test="${not hasEmptyBills}">
+							<c:forEach var="bill" items="${customer.bills}">
+								<div
+									class="grid grid-cols-9 px-3 py-4 text-gray-700 hover:bg-gray-50 transition-colors duration-150">
+									<div class="text-center font-medium col-span-2">${bill.id}</div>
+									<div class="text-center col-span-2">${bill.date}</div>
+									<div class="text-center col-span-2">${bill.time}</div>
+									<div
+										class="text-center text-green-600 font-semibold col-span-2">
+										<fmt:formatNumber value="${bill.total}" type="number"
+											minFractionDigits="2" maxFractionDigits="2" />
+									</div>
+									<div class="text-center">
+										<i
+											class="fa fa-angle-right text-gray-400 hover:text-gray-600 cursor-pointer"
+											aria-hidden="true"></i>
+									</div>
+								</div>
+							</c:forEach>
+						</c:if>
 					</div>
 
-					<!-- Empty State (Uncomment when needed) -->
-					<!--
-                    <div id="emptyState" class="p-8 text-center text-gray-500">
-                      <i class="fas fa-shopping-cart text-4xl mb-4 text-gray-300"></i>
-                      <p class="text-lg font-medium">No invoices added yet</p>
-                      <p class="text-sm">Add invoices using Create Bill</p>
-                    </div>
-                    -->
+					<!-- Empty Bill State -->
+					<c:if test="${hasEmptyBills}">
+						<div id="emptyState" class="p-8 text-center text-gray-500">
+							<i class="fas fa-shopping-cart text-4xl mb-4 text-gray-300"></i>
+							<p class="text-lg font-medium">No bills added yet</p>
+							<a href="<c:url value='/bill'/>" class="text-sm">Add a bill
+								using <span class="text-add-bill">Create Bill</span>
+							</a>
+						</div>
+					</c:if>
+
+					<!-- Empty Customer State -->
+					<c:if test="${not hasCustomer}">
+						<%@ include file="/WEB-INF/views/common/empty-customer-state.jsp"%>
+					</c:if>
 				</div>
 			</div>
 
-			<div class="flex justify-between items-center mt-8 px-2">
+			<div class="flex justify-between items-center mt-6 px-2">
 				<div>
-					<span class="text-sm text-gray-600">Showing 1-2 of 2
-						invoices</span>
+					<c:choose>
+						<c:when test="${hasEmptyBills}">
+							<span class="text-sm text-gray-600">No Items Found</span>
+						</c:when>
+						<c:otherwise>
+							<span class="text-sm text-gray-600"> Showing 1 -
+								${customer.bills.size()} of ${customer.bills.size()} items </span>
+						</c:otherwise>
+					</c:choose>
 					<p class="text-xs text-gray-400 mt-1">Last updated: Today</p>
 				</div>
 				<div class="flex items-center space-x-3">
@@ -332,109 +437,23 @@
 	</div>
 
 	<!-- Add new customer dialog -->
-	<dialog id="new-customer-modal"
-		class="m-auto p-0 border-0 w-full max-w-2xl rounded-xl bg-transparent h-full">
-	<div
-		class="relative bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden">
-		<!-- Modal content -->
-		<div
-			class="relative bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden">
-			<!-- Modal header -->
-			<div
-				class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-3 border-b border-gray-200">
-				<div class="flex items-center justify-between">
-					<div class="flex items-center space-x-3">
-						<div
-							class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center"
-							data-dialog-close>
-							<i class="fas fa-user-plus text-blue-600 text-sm"></i>
-						</div>
-						<h3 class="text-xl font-bold">Add New Customer</h3>
-					</div>
-					<button type="button" id="new-customer-close-btn"
-						class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors group">
-						<i class="fas fa-times text-gray-500 group-hover:text-gray-700"></i>
-					</button>
-				</div>
-			</div>
-
-			<!-- Modal body -->
-			<div class="px-6 py-5">
-				<form class="space-y-4" action="#" id="customer-form">
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<div class="space-y-2">
-							<label for="first-name"
-								class="block text-sm font-semibold text-gray-700"> <i
-								class="fas fa-user text-gray-400 mr-2"></i> First Name <span
-								class="text-red-500">*</span>
-							</label> <input type="text" name="first-name" id="first-name"
-								class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400"
-								placeholder="John" required />
-						</div>
-						<div class="space-y-2">
-							<label for="last-name"
-								class="block text-sm font-semibold text-gray-700"> <i
-								class="fas fa-user text-gray-400 mr-2"></i> Last Name <span
-								class="text-red-500">*</span>
-							</label> <input type="text" name="last-name" id="last-name"
-								class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400"
-								placeholder="Doe" required />
-						</div>
-					</div>
-
-					<!-- Contact information -->
-					<div class="space-y-2">
-						<label for="phone"
-							class="block text-sm font-semibold text-gray-700"> <i
-							class="fas fa-phone text-gray-400 mr-2"></i> Mobile Number <span
-							class="text-red-500">*</span>
-						</label> <input type="tel" name="phone" id="phone"
-							class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400"
-							placeholder="0700000000" required />
-					</div>
-
-					<div class="space-y-2">
-						<label for="email"
-							class="block text-sm font-semibold text-gray-700"> <i
-							class="fas fa-envelope text-gray-400 mr-2"></i> Email Address <span
-							class="text-red-500">*</span>
-						</label> <input type="email" name="email" id="email"
-							class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400"
-							placeholder="johndoe@email.com" required />
-					</div>
-
-					<div class="space-y-2">
-						<label for="address"
-							class="block text-sm font-semibold text-gray-700"> <i
-							class="fas fa-map-marker-alt text-gray-400 mr-2"></i> Home
-							Address <span class="text-red-500">*</span>
-						</label>
-						<textarea name="address" id="address" rows="3"
-							class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400 resize-none"
-							placeholder="Enter full address including street, city, postal code..."
-							required></textarea>
-					</div>
-
-					<!-- Action buttons -->
-					<div class="flex flex-col sm:flex-row gap-3">
-						<button type="button" id="cancel-btn"
-							class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
-							data-dialog-close>Cancel</button>
-						<button type="submit"
-							class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg px-6 py-3 focus:ring-4 focus:ring-blue-300 transition-all transform hover:scale-[1.02] active:scale-[0.98]">
-							<i class="fas fa-user-plus mr-2"></i> Create Customer
-						</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-	</dialog>
+	<%@ include file="/WEB-INF/views/common/new-customer-dialog.jsp"%>
 
 </div>
 
+<%
+if (request.getAttribute("openCustomerDialog") != null) {
+%>
+<script>
+	window.addEventListener("DOMContentLoaded", function() {
+		document.getElementById("new-customer-modal").showModal();
+	});
+</script>
+<%
+}
+%>
 
 <script type="text/javascript"
 	src="/bookshopManagement/assets/js/dialog-controller.js" defer></script>
 
-<%@ include file="/WEB-INF/pages/common/footer.jsp"%>
+<%@ include file="/WEB-INF/views/common/footer.jsp"%>

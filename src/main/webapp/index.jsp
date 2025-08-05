@@ -1,3 +1,3 @@
-<%@ include file="/WEB-INF/pages/common/header.jsp"%>
-<%@ include file="/WEB-INF/pages/login.jsp"%>
-<%@ include file="/WEB-INF/pages/common/footer.jsp"%>
+<jsp:include page="/WEB-INF/views/common/header.jsp" />
+<jsp:include page="/WEB-INF/views/login.jsp" />
+<jsp:include page="/WEB-INF/views/common/footer.jsp" />
