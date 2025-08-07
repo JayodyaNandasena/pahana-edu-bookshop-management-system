@@ -1,5 +1,7 @@
 package com.pahanaedu.util;
 
+import java.math.BigDecimal;
+
 public class Validator {
 	public static boolean isValidString(String input) {
 		return isValidString(input, 1, Integer.MAX_VALUE); // Default min = 1, max = unlimited
@@ -47,4 +49,19 @@ public class Validator {
 		// Check if it's a valid phone number
 		return isValidPhoneNumber(input);
 	}
+	
+	public static boolean isValidDigit(int input, int min, int max) {
+		return input>=min && input<=max;
+	}
+	
+	public static boolean isValidPrice(double price, double min, double max) {
+	    if (price <= min || price > max) {
+	        return false;
+	    }
+
+	    // Check for at most two decimal places
+	    BigDecimal bd = BigDecimal.valueOf(price);
+	    return bd.scale() <= 2;
+	}
+
 }

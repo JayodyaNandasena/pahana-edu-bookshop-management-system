@@ -28,7 +28,7 @@
 				<label for="itemSearch" class="text-lg font-semibold mb-2 block">
 					Enter item ID or name and click search </label>
 				<div class="flex gap-3">
-					<input type="text" name="search" value="${param.search}"
+					<input type="text" name="q" value="${param.search}"
 						placeholder="e.g., ITM0001 or text book" class="px-4 py-2"
 						id="itemSearch">
 					<button type="submit"
@@ -94,16 +94,27 @@
 								<div class="text-center font-medium">${item.id}</div>
 								<div class="text-center col-span-3">${item.name}</div>
 								<div class="text-center col-span-3">${item.category.name}</div>
-								<div class="text-center text-green-600 font-semibold col-span-2">
+								<div class="text-center text-green-600 col-span-2">
 									<fmt:formatNumber value="${item.unitPrice}" type="number"
 										minFractionDigits="2" maxFractionDigits="2" />
 								</div>
 								<div class="text-center col-span-2">${item.quantityAvailable}</div>
-								<div class="text-center"
-									data-dialog-open="delete-confirmation-modal"
-									data-item-id="${item.id}" data-item-name="${item.name}">
-									<i
-										class="fa-solid fa-trash text-gray-400 hover:text-red-600 cursor-pointer"></i>
+
+								<div class="flex justify-center space-x-4">
+									<div class="text-center" data-dialog-open="update-item-modal"
+										data-id="${item.id}" data-name="${item.name}"
+										data-category-id="${item.category.id}"
+										data-price="${item.unitPrice}"
+										data-quantity="${item.quantityAvailable}">
+										<i
+											class="fa-solid fa-pen-to-square text-gray-400 hover:text-green-600 cursor-pointer"></i>
+									</div>
+									<div class="text-center"
+										data-dialog-open="delete-confirmation-modal"
+										data-item-id="${item.id}" data-item-name="${item.name}">
+										<i
+											class="fa-solid fa-trash text-gray-400 hover:text-red-600 cursor-pointer"></i>
+									</div>
 								</div>
 							</div>
 						</c:forEach>
@@ -152,147 +163,56 @@
 	</div>
 
 	<!-- Add new item dialog -->
-	<dialog id="new-item-modal"
-		class="m-auto p-0 border-0 w-full max-w-2xl rounded-xl bg-transparent h-full">
-	<div
-		class="relative bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden">
-		<!-- Modal content -->
-		<div
-			class="relative bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden">
-			<!-- Modal header -->
-			<div
-				class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-3 border-b border-gray-200">
-				<div class="flex items-center justify-between">
-					<div class="flex items-center space-x-3">
-						<div
-							class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-							<i class="fa-solid fa-book text-blue-600 text-sm"></i>
-						</div>
-						<h3 class="text-xl font-bold">Add New Item</h3>
-					</div>
-					<button type="button" id="new-item-close-btn"
-						class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors group">
-						<i class="fas fa-times text-gray-500 group-hover:text-gray-700"></i>
-					</button>
-				</div>
-			</div>
-
-			<!-- Modal body -->
-			<div class="px-6 py-5">
-				<form class="space-y-4" action="#" id="customer-form">
-					<div class="space-y-2">
-						<label for="name"
-							class="block text-sm font-semibold text-gray-700"> <i
-							class="fa-solid fa-font text-gray-400 mr-2"></i> Item Name <span
-							class="text-red-500">*</span>
-						</label> <input type="text" name="name" id="name"
-							class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400"
-							placeholder="Text Book" required />
-					</div>
-
-					<div class="space-y-2">
-						<label for="category"
-							class="block text-sm font-semibold text-gray-700"> <i
-							class="fa-solid fa-list-ul text-gray-400 mr-2"></i> Category <span
-							class="text-red-500">*</span>
-						</label> <select name="category" id="category"
-							class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-700">
-							<option value="" disabled selected>Select a category</option>
-							<option value="books">Books</option>
-							<option value="stationery">Stationery</option>
-							<option value="educational">Educational Material</option>
-							<option value="gift">Gift Items</option>
-							<option value="misc">Miscellaneous</option>
-							<option value="all">All</option>
-						</select>
-					</div>
-
-					<div class="space-y-2">
-						<label for="price"
-							class="block text-sm font-semibold text-gray-700"> <i
-							class="fa-solid fa-money-bill text-gray-400 mr-2"></i> Unit Price
-							in LKR <span class="text-red-500">*</span>
-						</label> <input type="number" name="price" id="price"
-							class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400"
-							placeholder="200" required />
-					</div>
-
-					<div class="space-y-2">
-						<label for="quantity"
-							class="block text-sm font-semibold text-gray-700"> <i
-							class="fa-solid fa-hashtag text-gray-400 mr-2"></i> Quantity
-							Available <span class="text-red-500">*</span>
-						</label> <input type="number" name="quantity" id="quantity"
-							class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400 resize-none"
-							placeholder="1500" required />
-					</div>
-
-					<!-- Action buttons -->
-					<div class="flex flex-col sm:flex-row gap-3">
-						<button type="button" id="cancel-btn"
-							class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
-							data-dialog-close>Cancel</button>
-						<button type="submit"
-							class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg px-6 py-3 focus:ring-4 focus:ring-blue-300 transition-all transform hover:scale-[1.02] active:scale-[0.98]">
-							<i class="fa-solid fa-save mr-2"></i> Save Item
-						</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-	</dialog>
+	<%@ include file="/WEB-INF/views/common/new-item-dialog.jsp"%>
+	<%@ include file="/WEB-INF/views/common/update-item-dialog.jsp"%>
 
 	<dialog id="delete-confirmation-modal"
 		class="fixed inset-0 items-center justify-center max-w-xl p-0 bg-transparent backdrop-blur-sm">
 	<div
-		class="relative bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden">
-
+		class="bg-white rounded-xl shadow-2xl border border-gray-100 max-w-lg w-full overflow-hidden">
 		<!-- Modal header -->
 		<div
-			class="bg-gradient-to-r from-red-50 to-red-100 px-6 py-3 border-b border-gray-200">
-			<div class="flex items-center justify-between">
-				<div class="flex items-center space-x-3">
-					<div
-						class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-						<i class="fa-solid fa-triangle-exclamation text-red-600 text-sm"></i>
-					</div>
-					<h3 class="text-xl font-bold text-red-700">Confirm Delete</h3>
+			class="bg-gradient-to-r from-red-50 to-red-100 px-6 py-3 border-b border-gray-200 flex items-center justify-between">
+			<div class="flex items-center space-x-3">
+				<div
+					class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+					<i class="fa-solid fa-triangle-exclamation text-red-600 text-sm"></i>
 				</div>
-				<button type="button" id="delete-close-btn"
-					class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
-					<i class="fas fa-times text-gray-500"></i>
-				</button>
+				<h3 class="text-xl font-bold text-red-700">Confirm Delete</h3>
 			</div>
+			<button type="button" id="delete-close-btn"
+				class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
+				aria-label="Close delete modal">
+				<i class="fas fa-times text-gray-500"></i>
+			</button>
 		</div>
 
 		<!-- Modal body -->
 		<div class="px-6 py-5">
-			<p class="text-gray-700 text-base mb-4">
+			<p class="text-gray-700 text-base mb-6">
 				Are you sure you want to delete <span class="font-semibold"
-					id="delete-item-name-display">"Item Name"</span>? <br>This
+					id="delete-item-name-display">"Item Name"</span>? <br /> This
 				action cannot be undone.
 			</p>
 
 			<!-- Action buttons -->
-			<div class="flex flex-col sm:flex-row gap-3">
-				<form action="item" method="post" id="delete-form">
-					<input type="hidden" name="action" value="delete" /> <input
-						type="hidden" name="itemId" id="delete-item-id" />
-					<div class="flex gap-3">
-						<button type="button" id="cancel-delete-btn"
-							class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100">
-							Cancel</button>
-						<button type="submit"
-							class="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg px-6 py-3 transition-all transform hover:scale-[1.02] active:scale-[0.98]">
-							<i class="fa-solid fa-trash mr-2"></i> Delete
-						</button>
-					</div>
-				</form>
-			</div>
+			<form action="item" method="post" id="delete-form" class="flex gap-3">
+				<input type="hidden" name="action" value="delete" /> <input
+					type="hidden" name="itemId" id="delete-item-id" />
+
+				<button type="button" id="cancel-delete-btn"
+					class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition">
+					Cancel</button>
+
+				<button type="submit"
+					class="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg px-6 py-3 transition-transform transform hover:scale-[1.02] active:scale-[0.98]">
+					<i class="fa-solid fa-trash mr-2"></i> Delete
+				</button>
+			</form>
 		</div>
 	</div>
 	</dialog>
+
 
 </div>
 
