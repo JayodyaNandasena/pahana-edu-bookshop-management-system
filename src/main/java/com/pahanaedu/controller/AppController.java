@@ -116,7 +116,7 @@ public class AppController extends HttpServlet {
 			List<Item> items;
 			
 			String categoryIdParam = request.getParameter("category");
-			String searchParam = request.getParameter("search");			
+			String searchParam = request.getParameter("q");			
 
 			Integer selectedCategoryId = null;
 

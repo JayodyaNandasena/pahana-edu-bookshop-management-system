@@ -28,7 +28,7 @@
 				<label for="itemSearch" class="text-lg font-semibold mb-2 block">
 					Enter item ID or name and click search </label>
 				<div class="flex gap-3">
-					<input type="text" name="search" value="${param.search}"
+					<input type="text" name="q" value="${param.search}"
 						placeholder="e.g., ITM0001 or text book" class="px-4 py-2"
 						id="itemSearch">
 					<button type="submit"
