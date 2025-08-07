@@ -131,7 +131,7 @@
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        return response.json(); // Assuming your server sends a JSON response
+        return response.json();
       })
       .then(data => {
 		  // Clear existing error messages
