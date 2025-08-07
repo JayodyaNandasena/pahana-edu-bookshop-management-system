@@ -17,7 +17,7 @@ public class ItemDao {
 	public List<Item> all() throws SQLException {
 		List<Item> itemList = new ArrayList<Item>();
 
-		String sql = "SELECT i.id, i.name, i.unit_price, i.quantity_available, c.name AS category_name "
+		String sql = "SELECT i.id, i.name, i.unit_price, i.quantity_available, c.id AS category_id, c.name AS category_name "
 				+ "FROM item i " + "INNER JOIN category c ON i.category_id=c.id " + "WHERE i.is_deleted = false "
 				+ "ORDER BY i.id ASC";
 
@@ -31,7 +31,7 @@ public class ItemDao {
 				item.setName(rs.getString("name"));
 				item.setUnitPrice(rs.getDouble("unit_price"));
 				item.setQuantityAvailable(rs.getInt("quantity_available"));
-				item.setCategory(new Category(rs.getString("category_name")));
+				item.setCategory(new Category(rs.getInt("category_id"), rs.getString("category_name")));
 				itemList.add(item);
 			}
 		}
@@ -41,7 +41,7 @@ public class ItemDao {
 	public List<Item> byCategory(int categoryId) throws SQLException {
 		List<Item> itemList = new ArrayList<Item>();
 
-		String sql = "SELECT i.id, i.name, i.unit_price, i.quantity_available, c.name AS category_name "
+		String sql = "SELECT i.id, i.name, i.unit_price, i.quantity_available,c.id AS category_id, c.name AS category_name "
 				+ "FROM item i " + "INNER JOIN category c ON i.category_id=c.id "
 				+ "WHERE category_id = ? AND i.is_deleted = 0 " + "ORDER BY i.id ASC";
 
@@ -56,7 +56,7 @@ public class ItemDao {
 					item.setName(rs.getString("name"));
 					item.setUnitPrice(rs.getDouble("unit_price"));
 					item.setQuantityAvailable(rs.getInt("quantity_available"));
-					item.setCategory(new Category(rs.getString("category_name")));
+					item.setCategory(new Category(rs.getInt("category_id"), rs.getString("category_name")));
 					itemList.add(item);
 				}
 			}
@@ -67,7 +67,7 @@ public class ItemDao {
 	public List<Item> byIdOrName(String searchTerm) throws SQLException {
 		List<Item> itemList = new ArrayList<Item>();
 
-		String sql = "SELECT i.id, i.name, i.unit_price, i.quantity_available, c.name AS category_name "
+		String sql = "SELECT i.id, i.name, i.unit_price, i.quantity_available, c.id AS category_id, c.name AS category_name "
 				+ "FROM item i " + "INNER JOIN category c ON i.category_id=c.id " + "WHERE i.id = ? OR i.name LIKE ? "
 				+ "ORDER BY i.id ASC";
 
@@ -90,7 +90,7 @@ public class ItemDao {
 					item.setName(rs.getString("name"));
 					item.setUnitPrice(rs.getDouble("unit_price"));
 					item.setQuantityAvailable(rs.getInt("quantity_available"));
-					item.setCategory(new Category(rs.getString("category_name")));
+					item.setCategory(new Category(rs.getInt("category_id"), rs.getString("category_name")));
 					itemList.add(item);
 				}
 			}
@@ -133,6 +133,30 @@ public class ItemDao {
 				return PersistResult.ITEM_NAME_CATEGORY_EXISTS;
 			}
 			// Log the error and return failure
+			System.err.println("Database error: " + e.getMessage());
+			return PersistResult.OTHER_ERROR;
+		}
+	}
+	
+	public PersistResult update(int id, String name, int category, double price, int quantity) {
+		String sql = "UPDATE item SET name = ?, unit_price = ?, quantity_available = ?, category_id = ? WHERE id = ?";
+
+		try (Connection conn = DbConnectionFactory.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setString(1, name);
+			stmt.setDouble(2, price);
+			stmt.setInt(3, quantity);
+			stmt.setInt(4, category);
+			stmt.setInt(5, id);
+
+			int rowsAffected = stmt.executeUpdate();
+			return rowsAffected > 0 ? PersistResult.SUCCESS : PersistResult.OTHER_ERROR;
+
+		} catch (SQLException e) {
+			if (isUniqueConstraintViolation(e)) {
+				return PersistResult.ITEM_NAME_CATEGORY_EXISTS;
+			}
 			System.err.println("Database error: " + e.getMessage());
 			return PersistResult.OTHER_ERROR;
 		}

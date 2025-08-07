@@ -56,13 +56,30 @@ public class ItemController extends HttpServlet {
 			return;
 		}
 
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+
+		if ("update".equals(action)) {
+			try {
+				int itemId = Integer.parseInt(request.getParameter("u_id"));
+				String name = request.getParameter("u_name");
+				int category = Integer.parseInt(request.getParameter("u_category"));
+				double price = Double.parseDouble(request.getParameter("u_price"));
+				int quantity = Integer.parseInt(request.getParameter("u_quantity"));
+
+				handleItemUpdate(itemId, name, category, price, quantity, request, response);
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+				// Return JSON error response for unexpected exception
+				writeJsonError(response, "An unexpected error occurred.");
+			}
+			return;
+		}
+
 		String name = request.getParameter("name");
 		int category = Integer.parseInt(request.getParameter("category"));
 		double price = Double.parseDouble(request.getParameter("price"));
 		int quantity = Integer.parseInt(request.getParameter("quantity"));
-
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
 
 		try {
 			handleItemCreate(name, category, price, quantity, request, response);
@@ -70,6 +87,53 @@ public class ItemController extends HttpServlet {
 			e.printStackTrace();
 			// Return JSON error response for unexpected exception
 			writeJsonError(response, "An unexpected error occurred.");
+		}
+
+	}
+
+	private void handleItemUpdate(int id, String name, int category, double price, int quantity,
+			HttpServletRequest request, HttpServletResponse response) throws IOException {
+		// Validate input fields and collect errors
+		HashMap<String, String> errors = validateInputs(name, category, price, quantity);
+
+		// If validation errors exist, return them as JSON response
+		if (!errors.isEmpty()) {
+			writeJsonErrors(response, errors);
+			return;
+		}
+
+		try {
+			// Attempt to persist customer data and handle result accordingly
+			PersistResult result = itemService.update(id, name, category, price, quantity);
+
+			switch (result) {
+			case SUCCESS:
+				// Success - send JSON success message
+				writeJsonSuccess(response, "Item updated successfully.");
+				return;
+
+			case ITEM_NAME_CATEGORY_EXISTS:
+				errors.put("categoryuNameError",
+						"An item with the same name already exists in the selected category. Please use a different name or choose another category.");
+				break;
+
+			case OTHER_ERROR:
+				errors.put("generalError", "Failed to create item. Please try again.");
+				break;
+
+			default:
+				// Handle unexpected result
+				writeJsonError(response, "Unexpected error occurred.");
+				return;
+			}
+
+			// Return errors if persistence fails due to known constraints
+			writeJsonErrors(response, errors);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			// Return a generic error message on unexpected exceptions
+			writeJsonError(response, "An error occurred while updating the item. Please try again.");
 		}
 
 	}
@@ -84,7 +148,7 @@ public class ItemController extends HttpServlet {
 			writeJsonErrors(response, errors);
 			return;
 		}
-		
+
 		try {
 			// Attempt to persist customer data and handle result accordingly
 			PersistResult result = itemService.persist(name, category, price, quantity);
@@ -96,7 +160,8 @@ public class ItemController extends HttpServlet {
 				return;
 
 			case ITEM_NAME_CATEGORY_EXISTS:
-				errors.put("categoryNameError", "An item with the same name already exists in the selected category. Please use a different name or choose another category.");
+				errors.put("categoryNameError",
+						"An item with the same name already exists in the selected category. Please use a different name or choose another category.");
 				break;
 
 			case OTHER_ERROR:
@@ -110,15 +175,13 @@ public class ItemController extends HttpServlet {
 			}
 
 			// Return errors if persistence fails due to known constraints
-			writeJsonErrors(response, errors);	
-			
+			writeJsonErrors(response, errors);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			// Return a generic error message on unexpected exceptions
 			writeJsonError(response, "An error occurred while creating the item. Please try again.");
 		}
-		
-
 	}
 
 	private HashMap<String, String> validateInputs(String name, int category, double price, int quantity) {
@@ -127,19 +190,20 @@ public class ItemController extends HttpServlet {
 		if (!Validator.isValidString(name, 1, 150)) {
 			errors.put("nameError", "Item name must be between 1 and 150 characters.");
 		}
-		
+
 		if (!Validator.isValidDigit(category, 1, 5)) {
 			errors.put("categoryError", "Please select a valid category.");
 		}
-		
+
 		if (!Validator.isValidPrice(price, 0.0, 100000.00)) {
-			errors.put("priceError", "Unit price must be greater than 0 and up to 100,000 with at most two decimal places.");
+			errors.put("priceError",
+					"Unit price must be greater than 0 and up to 100,000 with at most two decimal places.");
 		}
-		
+
 		if (!Validator.isValidDigit(quantity, 1, 10000)) {
 			errors.put("quantityError", "Quantity must be between 1 and 10000.");
 		}
-		
+
 		return errors;
 	}
 
