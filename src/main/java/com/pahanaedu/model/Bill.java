@@ -2,6 +2,7 @@ package com.pahanaedu.model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 public class Bill {
 	private long id;
@@ -10,17 +11,20 @@ public class Bill {
 	private double total;
 	private Customer customer;
 	private User cashier;
+	private List<BillItem> billItems;
 
 	public Bill() {
 	}
 
-	public Bill(long id, LocalDate date, LocalTime time, double total, Customer customer, User cashier) {
+	public Bill(long id, LocalDate date, LocalTime time, double total, Customer customer, User cashier,
+			List<BillItem> billItems) {
 		this.id = id;
 		this.date = date;
 		this.time = time;
 		this.total = total;
 		this.customer = customer;
 		this.cashier = cashier;
+		this.billItems = billItems;
 	}
 
 	public long getId() {
@@ -69,5 +73,13 @@ public class Bill {
 
 	public void setCashier(User cashier) {
 		this.cashier = cashier;
+	}
+
+	public List<BillItem> getBillItems() {
+		return billItems;
+	}
+
+	public void setBillItems(List<BillItem> billItems) {
+		this.billItems = billItems;
 	}
 }
