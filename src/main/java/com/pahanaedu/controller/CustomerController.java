@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.json.JSONObject;
+
 import com.pahanaedu.model.Customer;
 import com.pahanaedu.model.enums.PersistResult;
 import com.pahanaedu.service.CustomerService;
@@ -20,6 +22,7 @@ import com.pahanaedu.util.Validator;
 @WebServlet("/customer")
 public class CustomerController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
 	private CustomerService customerService;
 
 	public CustomerController() {
@@ -30,14 +33,12 @@ public class CustomerController extends HttpServlet {
 		customerService = CustomerService.getInstance();
 	}
 
-	// TODO: search by mobile, return name and ID
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		response.sendRedirect(request.getContextPath() + "/customers");
 	}
 
-	// TODO: fix error redirection
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -71,15 +72,15 @@ public class CustomerController extends HttpServlet {
 		String email = request.getParameter("email");
 		String address = request.getParameter("address");
 
-		// Determine the source page to redirect back to on error
-		String sourcePage = getSourcePage(request);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
 
 		try {
-			handleCustomerCreate(firstName, lastName, phone, email, address, request, response, sourcePage);
-		} catch (ServletException | IOException e) {
+			handleCustomerCreate(firstName, lastName, phone, email, address, request, response);
+		} catch (Exception e) {
 			e.printStackTrace();
-			request.setAttribute("errorMessage", "An unexpected error occurred.");
-			request.getRequestDispatcher(sourcePage).forward(request, response);
+			// Return JSON error response for unexpected exception
+			writeJsonError(response, "An unexpected error occurred.");
 		}
 	}
 
@@ -175,85 +176,60 @@ public class CustomerController extends HttpServlet {
 	}
 
 	private void handleCustomerCreate(String firstName, String lastName, String phone, String email, String address,
-			HttpServletRequest request, HttpServletResponse response, String sourcePage)
-			throws IOException, ServletException {
+			HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+		// Validate input fields and collect errors
 		HashMap<String, String> errors = validateInputs(firstName, lastName, phone, email, address);
 
-		// If there are validation errors, send them back to the source form
+		// If validation errors exist, return them as JSON response
 		if (!errors.isEmpty()) {
-			request.setAttribute("errors", errors);
-			// Preserve form data
-			preserveFormData(request, firstName, lastName, phone, email, address);
-//			request.getRequestDispatcher(sourcePage).forward(request, response);
-			response.sendRedirect(request.getContextPath() + sourcePage);
-			return;
+		    writeJsonErrors(response, errors);
+		    return;
 		}
 
 		try {
+			// Attempt to persist customer data and handle result accordingly
 			PersistResult result = customerService.persist(firstName, lastName, phone, email, address);
+
 			switch (result) {
 			case SUCCESS:
-				response.sendRedirect(request.getContextPath() + sourcePage);
+				// Success - send JSON success message
+				writeJsonSuccess(response, "Customer created successfully.");
 				return;
+
 			case EMAIL_EXISTS:
 				errors.put("emailError", "Email already exists. Please search for the customer or use another email.");
 				break;
+
 			case PHONE_EXISTS:
 				errors.put("phoneError",
 						"Mobile number already exists. Please search for the customer or use another mobile number.");
 				break;
+
 			case OTHER_ERROR:
 				errors.put("generalError", "Failed to create customer. Please try again.");
 				break;
+
 			default:
-				throw new IllegalArgumentException("Unexpected value: " + result);
+				// Handle unexpected result
+				writeJsonError(response, "Unexpected error occurred.");
+				return;
 			}
 
-			// Handling database constraint errors
-			request.setAttribute("errors", errors);
-			preserveFormData(request, firstName, lastName, phone, email, address);
-			request.setAttribute("openCustomerDialog", true);
-			request.getRequestDispatcher(sourcePage).forward(request, response);
-
+			// Return errors if persistence fails due to known constraints
+			writeJsonErrors(response, errors);	
+			
 		} catch (Exception e) {
 			e.printStackTrace();
-			errors.put("generalError", "An error occurred while creating the customer. Please try again.");
-			request.setAttribute("errors", errors);
-			preserveFormData(request, firstName, lastName, phone, email, address);
-			request.getRequestDispatcher(sourcePage).forward(request, response);
+			// Return a generic error message on unexpected exceptions
+			writeJsonError(response, "An error occurred while creating the customer. Please try again.");
 		}
-	}
-
-	// Determines the source page to redirect back to on error
-	private String getSourcePage(HttpServletRequest request) {
-		String sourcePage = request.getParameter("active_page");
-
-		if (sourcePage != null && !sourcePage.isBlank()) {
-			if (!sourcePage.startsWith("/")) {
-				sourcePage = "/" + sourcePage;
-			}
-			return sourcePage;
-		}
-
-		// Default to /customers
-		return "/customers";
-	}
-
-	// Preserves form data
-	private void preserveFormData(HttpServletRequest request, String firstName, String lastName, String phone,
-			String email, String address) {
-		request.setAttribute("firstName", firstName);
-		request.setAttribute("lastName", lastName);
-		request.setAttribute("phone", phone);
-		request.setAttribute("email", email);
-		request.setAttribute("address", address);
 	}
 
 	private HashMap<String, String> validateInputs(String firstName, String lastName, String phone, String email,
 			String address) {
 		HashMap<String, String> errors = new HashMap<>();
 
-		// Validate inputs
 		if (!Validator.isValidString(firstName, 1, 100)) {
 			errors.put("firstNameError", "First name must be between 1 and 100 characters.");
 		}
@@ -272,4 +248,30 @@ public class CustomerController extends HttpServlet {
 
 		return errors;
 	}
+
+	// helper methods for success and error JSON responses using JSONObject
+	private void writeJsonSuccess(HttpServletResponse response, String message) throws IOException {
+		JSONObject jsonResponse = new JSONObject();
+		jsonResponse.put("success", true);
+		jsonResponse.put("message", message);
+
+		response.getWriter().write(jsonResponse.toString());
+	}
+
+	private void writeJsonErrors(HttpServletResponse response, Map<String, String> errors) throws IOException {
+	    JSONObject jsonResponse = new JSONObject();
+	    jsonResponse.put("success", false);
+	    jsonResponse.put("errors", new JSONObject(errors)); // converts Map to JSON object automatically
+
+	    response.getWriter().write(jsonResponse.toString());
+	}
+	
+	private void writeJsonError(HttpServletResponse response, String message) throws IOException {
+	    JSONObject jsonResponse = new JSONObject();
+	    jsonResponse.put("success", false);
+	    jsonResponse.put("message", message);
+
+	    response.getWriter().write(jsonResponse.toString());
+	}
+
 }
