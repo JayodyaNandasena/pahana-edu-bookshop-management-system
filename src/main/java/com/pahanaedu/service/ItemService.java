@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.pahanaedu.dao.ItemDao;
 import com.pahanaedu.model.Item;
+import com.pahanaedu.model.enums.PersistResult;
 
 public class ItemService {
 	private static ItemService instance;
@@ -39,5 +40,9 @@ public class ItemService {
 
 	public boolean delete(int itemId) {
 		return itemDao.delete(itemId);
+	}
+
+	public PersistResult persist(String name, int category, double price, int quantity) {
+		return itemDao.persist(name, category, price, quantity);
 	}
 }

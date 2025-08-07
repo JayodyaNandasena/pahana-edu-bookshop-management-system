@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.pahanaedu.model.Category;
 import com.pahanaedu.model.Item;
+import com.pahanaedu.model.enums.PersistResult;
 import com.pahanaedu.util.DbConnectionFactory;
 
 public class ItemDao {
@@ -111,6 +112,41 @@ public class ItemDao {
 		} catch (SQLException e) {
 			return false;
 		}
+	}
+
+	public PersistResult persist(String name, int category, double price, int quantity) {
+		String sql = "INSERT INTO item (name, unit_price, quantity_available, category_id) VALUES (?, ?, ?, ?)";
+
+		try (Connection conn = DbConnectionFactory.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setString(1, name);
+			stmt.setDouble(2, price);
+			stmt.setInt(3, quantity);
+			stmt.setInt(4, category);
+
+			int rowsAffected = stmt.executeUpdate();
+			return rowsAffected > 0 ? PersistResult.SUCCESS : PersistResult.OTHER_ERROR;
+
+		} catch (SQLException e) {
+			if (isUniqueConstraintViolation(e)) {
+				return PersistResult.ITEM_NAME_CATEGORY_EXISTS;
+			}
+			// Log the error and return failure
+			System.err.println("Database error: " + e.getMessage());
+			return PersistResult.OTHER_ERROR;
+		}
+	}
+
+	// Helper method to detect unique constraint violations
+	private boolean isUniqueConstraintViolation(SQLException e) {
+		String sqlState = e.getSQLState();
+		int errorCode = e.getErrorCode();
+
+		// MySQL specific codes for unique constraint violations:
+		// - Error code 1062: Duplicate entry for key
+		// - SQL state 23000: Integrity constraint violation
+		return errorCode == 1062 || "23000".equals(sqlState);
 	}
 
 }
