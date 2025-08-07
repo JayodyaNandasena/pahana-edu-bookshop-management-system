@@ -2,6 +2,7 @@ package com.pahanaedu.controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -10,8 +11,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-import org.apache.tomcat.util.log.SystemLogHandler;
+import com.pahanaedu.model.Customer;
+import com.pahanaedu.service.CustomerService;
+import com.pahanaedu.util.Validator;
 
 import com.pahanaedu.model.Category;
 import com.pahanaedu.model.Item;
@@ -45,6 +49,7 @@ public class AppController extends HttpServlet {
 			request.setAttribute("activePage", "bill");
 			break;
 		case "/customers":
+			handleCustomersPage(request);
 			targetPage = "/WEB-INF/views/customers.jsp";
 			request.setAttribute("activePage", "customers");
 			break;
@@ -66,6 +71,43 @@ public class AppController extends HttpServlet {
 
 		RequestDispatcher dispatcher = request.getRequestDispatcher(targetPage);
 		dispatcher.forward(request, response);
+	}
+
+	private void handleCustomersPage(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+
+		// Move errors from session to request
+		Object errorsObj = session.getAttribute("errors");
+		if (errorsObj != null) {
+			request.setAttribute("errors", errorsObj);
+			session.removeAttribute("errors");
+		}
+
+		// Move preserved form data to request
+		Object formData = session.getAttribute("formData");
+		if (formData != null) {
+			request.setAttribute("formData", formData);
+			session.removeAttribute("formData");
+		}
+
+		// Always try to fetch customer from DB if `q` exists
+		HashMap<String, String> errors = new HashMap<>();
+		try {
+			String searchParam = request.getParameter("q");
+			if (searchParam != null && !searchParam.isEmpty()) {
+				if (!Validator.isValidCustomerIdOrPhone(searchParam)) {
+					errors.put("qError", "Input must be a valid customer ID or a phone number starting with 070–078.");
+					request.setAttribute("errors", errors);
+					return;
+				}
+
+				Customer customer = CustomerService.getInstance().byIdOrPhone(searchParam);
+				request.setAttribute("customer", customer);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			request.setAttribute("error", "Unable to search customer.");
+		}
 	}
 	
 	private void handleInventoryPage(HttpServletRequest request) {
