@@ -1,6 +1,7 @@
 package com.pahanaedu.controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,8 +13,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
 
+import com.pahanaedu.model.Item;
 import com.pahanaedu.model.enums.PersistResult;
 import com.pahanaedu.service.ItemService;
+import com.pahanaedu.service.exception.InsufficientStockException;
+import com.pahanaedu.service.exception.ItemNotFoundException;
 import com.pahanaedu.util.Validator;
 
 @WebServlet("/item")
@@ -31,8 +35,15 @@ public class ItemController extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		if (request.getParameter("id") != null && request.getParameter("quantity") != null) {
+			int id = Integer.parseInt(request.getParameter("id"));
+			int quantity = Integer.parseInt(request.getParameter("quantity"));
+
+			handleSearchById(id, quantity, request, response);
+			return;
+		}
+
+		response.sendRedirect(request.getContextPath() + "/inventory");
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -182,6 +193,55 @@ public class ItemController extends HttpServlet {
 			// Return a generic error message on unexpected exceptions
 			writeJsonError(response, "An error occurred while creating the item. Please try again.");
 		}
+	}
+
+	private void handleSearchById(int id, int quantity, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	    response.setContentType("application/json");
+	    response.setCharacterEncoding("UTF-8");
+
+	    try {
+	        // Validate input
+	        HashMap<String, String> errors = new HashMap<>();
+
+	        if (!Validator.isValidDigit(id, 1, Integer.MAX_VALUE)) {
+	            errors.put("idError", "Item ID must be a positive integer.");
+	        }
+
+	        if (!Validator.isValidDigit(quantity, 1, 10000)) {
+	            errors.put("quantityError", "Quantity must be between 1 and 10000.");
+	        }
+
+	        if (!errors.isEmpty()) {
+	            writeJsonErrors(response, errors);
+	            return;
+	        }
+
+	        // Item search with quantity check
+	        Item item = itemService.byId(id, quantity);
+
+	        JSONObject jsonResponse = new JSONObject();
+	        JSONObject itemJson = new JSONObject();
+
+	        itemJson.put("id", item.getId());
+	        itemJson.put("name", item.getName());
+	        itemJson.put("quantity", quantity);
+	        itemJson.put("unitPrice", item.getUnitPrice());
+	        itemJson.put("total", quantity * item.getUnitPrice());
+
+	        jsonResponse.put("success", true);
+	        jsonResponse.put("item", itemJson);
+
+	        response.getWriter().write(jsonResponse.toString());
+
+	    } catch (ItemNotFoundException e) {
+	        writeJsonError(response, e.getMessage());
+	    } catch (InsufficientStockException e) {
+	        writeJsonError(response, e.getMessage());
+	    } catch (SQLException e) {
+	        writeJsonError(response, "Database error occurred while fetching item.");
+	    } catch (Exception e) {
+	        writeJsonError(response, "Unexpected error: " + e.getMessage());
+	    }
 	}
 
 	private HashMap<String, String> validateInputs(String name, int category, double price, int quantity) {

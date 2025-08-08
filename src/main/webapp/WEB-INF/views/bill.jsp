@@ -85,38 +85,48 @@
 					</div>
 					<div class="px-6 pt-3 pb-6">
 						<!-- Add Item Form -->
-						<div
-							class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6 p-6 bg-blue-50 rounded-xl border border-blue-200">
-							<div class="md:col-span-2">
-								<label class="block text-sm font-semibold text-gray-700 mb-3">Item
-									ID</label> <input id="item-id" class="px-4 py-3 border-gray-400"
-									placeholder="eg: ITM00001" disabled>
+						<form id="add-item-form" method="get" action="item">
+							<div
+								class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6 p-6 bg-blue-50 rounded-xl border border-blue-200">
+								<div class="md:col-span-2">
+									<label class="block text-sm font-semibold text-gray-700 mb-3">Item
+										ID</label> <input type="number" id="item-id" name="id" min="1"
+										class="px-4 py-3 border-gray-400" placeholder="eg: ITM00001"
+										required disabled>
+									<p class="text-red-500 text-sm ml-1" id="idError"></p>
+								</div>
+								<div class="md:col-span-2">
+									<label class="block text-sm font-semibold text-gray-700 mb-3">Quantity</label>
+									<input type="number" id="item-quantity" name="quantity"
+										placeholder="0" min="1" class="px-4 py-3 border-gray-400"
+										required disabled>
+									<p class="text-red-500 text-sm ml-1" id="quantityError"></p>
+								</div>
+								<div class="flex items-end">
+									<button type="submit" id="btn-add-bill-item"
+										class="btn-primary w-full py-3 rounded-xl font-semibold transition-all duration-300 pulse-ring"
+										disabled>
+										<!-- <i class="fas fa-plus mr-2"></i> -->
+										Add
+									</button>
+								</div>
+								<div class="md:col-span-4">
+									<p class="text-red-500 text-sm ml-1" id="addItemError"></p>
+								</div>
 							</div>
-							<div class="md:col-span-2">
-								<label class="block text-sm font-semibold text-gray-700 mb-3">Quantity</label>
-								<input type="number" id="item-quantity" placeholder="0" min="1"
-									class="px-4 py-3 border-gray-400" disabled>
-							</div>
-							<div class="flex items-end">
-								<button id="btn-add-bill-item"
-									class="btn-primary w-full py-3 rounded-xl font-semibold transition-all duration-300 pulse-ring"
-									disabled>
-									<!-- <i class="fas fa-plus mr-2"></i> -->
-									Add
-								</button>
-							</div>
-						</div>
+						</form>
 
 						<!-- Items List -->
 						<div
 							class="overflow-hidden rounded-xl border-2 border-gray-200 shadow-sm">
 							<div
 								class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b-2 border-gray-200">
-								<div class="grid grid-cols-6 gap-4 text-gray-700">
+								<div class="grid grid-cols-10 gap-4 text-gray-700">
+									<div class="text-center"></div>
 									<div class="text-center col-span-2">Item</div>
-									<div class="text-center">Quantity</div>
-									<div class="text-center">Unit Price</div>
-									<div class="text-center">Total</div>
+									<div class="text-center col-span-2">Quantity</div>
+									<div class="text-center col-span-2">Unit Price</div>
+									<div class="text-center col-span-2">Total</div>
 									<div class="text-center"></div>
 								</div>
 							</div>
@@ -133,12 +143,11 @@
 						<!-- Action Buttons -->
 						<div
 							class="flex justify-between mt-6 pt-6 border-t-2 border-gray-200">
-							<button id="clearAllBtn"
-								class="px-6 py-3 bg-red-100 text-red-700 rounded-xl font-semibold hover:bg-red-200 transition-all duration-300 flex items-center space-x-2"
-								disabled>
+							<button data-dialog-open="clear-items-confirmation-modal"
+								class="px-6 py-3 bg-red-100 text-red-700 rounded-xl font-semibold hover:bg-red-200 transition-all duration-300 flex items-center space-x-2">
 								<i class="fas fa-trash"></i> <span>Clear All Items</span>
 							</button>
-							<button id="generateBillBtn"
+							<button id="btn-generate-bill"
 								class="btn-confirm px-8 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2"
 								disabled>
 								<i class="fas fa-file-invoice-dollar"></i> <span>Generate
@@ -225,6 +234,50 @@
 	<%@ include file="/WEB-INF/views/common/new-customer-dialog.jsp"%>
 
 </div>
+
+<dialog id="clear-items-confirmation-modal"
+	class="fixed inset-0 items-center justify-center max-w-xl p-0 bg-transparent backdrop-blur-sm">
+<div
+	class="bg-white rounded-xl shadow-2xl border border-gray-100 max-w-lg w-full overflow-hidden">
+	<!-- Modal header -->
+	<div
+		class="bg-gradient-to-r from-red-50 to-red-100 px-6 py-3 border-b border-gray-200 flex items-center justify-between">
+		<div class="flex items-center space-x-3">
+			<div
+				class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+				<i class="fa-solid fa-triangle-exclamation text-red-600 text-sm"></i>
+			</div>
+			<h3 class="text-xl font-bold text-red-700">Confirm Clear Items</h3>
+		</div>
+		<button type="button" id="delete-close-btn"
+			class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
+			aria-label="Close delete modal">
+			<i class="fas fa-times text-gray-500"></i>
+		</button>
+	</div>
+
+	<!-- Modal body -->
+	<div class="px-6 py-5">
+		<p class="text-gray-700 text-base mb-6">Are you sure you want to
+			clear all items? This action cannot be undone.</p>
+
+		<!-- Action buttons -->
+		<div class="flex gap-3">
+			<input type="hidden" name="action" value="delete" /> <input
+				type="hidden" name="itemId" id="delete-item-id" />
+
+			<button type="button" id="cancel-delete-btn"
+				class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition">
+				Cancel</button>
+
+			<button id="btn-clear-all"
+				class="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg px-6 py-3 transition-transform transform hover:scale-[1.02] active:scale-[0.98]">
+				<i class="fa-solid fa-trash mr-2"></i> Clear All
+			</button>
+		</div>
+	</div>
+</div>
+</dialog>
 
 <script type="text/javascript"
 	src="/bookshopManagement/assets/js/bill.js"></script>

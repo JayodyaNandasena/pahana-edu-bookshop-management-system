@@ -1,4 +1,5 @@
 let selectedCustomer = null;
+let billItems = [];
 
 document.addEventListener("DOMContentLoaded", function() {
 	// seach customer
@@ -9,6 +10,17 @@ document.addEventListener("DOMContentLoaded", function() {
 	// confirm customer
 	document.getElementById("btn-confirm-customer").addEventListener("click", function(event) {
 		confirmCustomer();
+	});
+
+	// add bill item
+	document.getElementById("add-item-form").addEventListener("submit", function(event) {
+		addItem(event, this);
+	});
+
+	// clear items list
+	document.getElementById("btn-clear-all").addEventListener("click", function() {
+		console.log("here");
+		clearAllItems();
 	});
 
 });
@@ -80,3 +92,126 @@ function confirmCustomer() {
 	document.getElementById("item-id").disabled = false;
 	document.getElementById("item-quantity").disabled = false;
 }
+
+function addItem(event, form) {
+	event.preventDefault();
+
+	const formData = new FormData(form);
+	const params = new URLSearchParams(formData).toString();
+	const urlWithParams = `${form.action}?${params}`;
+
+	fetch(urlWithParams, {
+		method: "GET"
+	})
+		.then(response => {
+			if (!response.ok) {
+				throw new Error("Network response was not ok");
+			}
+			return response.json();
+		})
+		.then(data => {
+			const errorFields = ["idError", "quantityError", "addItemError"];
+			errorFields.forEach(id => {
+				const el = document.getElementById(id);
+				if (el) el.textContent = "";
+			});
+
+			if (data.success && data.item) {
+				billItems.push(data.item);
+				updateItemsList();
+				updatePreview();
+				document.getElementById("btn-generate-bill").disabled = false;
+
+			} else if (!data.success) {
+				if (data.errors) {
+					for (const [key, msg] of Object.entries(data.errors)) {
+						const el = document.getElementById(key);
+						if (el) el.textContent = msg;
+					}
+				}
+
+				if (data.message) {
+					document.getElementById("addItemError").innerText = data.message;
+				}
+
+				document.getElementById("btn-generate-bill").disabled = true;
+
+			} else {
+				alert("An error occurred while searching the item.");
+			}
+		})
+		.catch(error => {
+			alert("There was a problem searching the item: " + error.message);
+		});
+}
+
+function updateItemsList() {
+	const itemsList = document.getElementById('itemsList');
+	const emptyState = document.getElementById('emptyState');
+
+	if (billItems.length === 0) {
+		itemsList.innerHTML = '';
+		emptyState.style.display = 'block';
+		return;
+	}
+
+	emptyState.style.display = 'none';
+	itemsList.innerHTML = billItems.map((item, index) => `
+		<div class="px-6 py-4 hover:bg-blue-50 transition-colors fade-in">
+			<div class="grid grid-cols-10 gap-4 items-center">
+				<div class="text-s text-gray-400 font-medium">${item.id}</div>
+				<div class="col-span-2 font-sm text-gray-900">${item.name}</div>
+				<div class="col-span-2 text-center font-bold text-blue-600">${item.quantity}</div>
+				<div class="col-span-2 text-right font-semibold">${item.unitPrice.toFixed(2)}</div>
+				<div class="col-span-2 text-right font-bold text-green-600">${item.total.toFixed(2)}</div>
+				<div class="text-center">
+					<button onclick="removeItem(${index})" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-all">
+						<i class="fas fa-trash"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+	`).join('');
+}
+
+function removeItem(index) {
+	billItems.splice(index, 1);
+	updateItemsList();
+	updatePreview();
+}
+
+function clearAllItems() {
+	console.log("here 2");
+	if (billItems.length > 0) {
+		billItems = [];
+		updateItemsList();
+		updatePreview();
+	}
+}
+
+function updatePreview() {
+	const previewItems = document.getElementById('previewItems');
+	const previewTotal = document.getElementById('previewTotal');
+	const invoiceNumber = document.getElementById('invoiceNumber');
+
+	// Remove or define invoiceNumber properly
+	invoiceNumber.textContent = ''; // or remove this line
+
+	if (billItems.length === 0) {
+		previewItems.innerHTML = '<p class="text-gray-500 text-center py-4">No items added</p>';
+		previewTotal.textContent = '0.00';
+		return;
+	}
+
+	const total = billItems.reduce((sum, item) => sum + item.total, 0);
+
+	previewItems.innerHTML = billItems.map(item => `
+		<div class="flex justify-between text-sm">
+			<span class="text-gray-700">${item.name} (×${item.quantity})</span>
+			<span class="font-semibold text-gray-900">${item.total.toFixed(2)}</span>
+		</div>
+	`).join('');
+
+	previewTotal.textContent = `${total.toFixed(2)}`;
+}
+

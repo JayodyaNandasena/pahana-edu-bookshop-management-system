@@ -137,7 +137,7 @@ public class ItemDao {
 			return PersistResult.OTHER_ERROR;
 		}
 	}
-	
+
 	public PersistResult update(int id, String name, int category, double price, int quantity) {
 		String sql = "UPDATE item SET name = ?, unit_price = ?, quantity_available = ?, category_id = ? WHERE id = ?";
 
@@ -159,6 +159,29 @@ public class ItemDao {
 			}
 			System.err.println("Database error: " + e.getMessage());
 			return PersistResult.OTHER_ERROR;
+		}
+	}
+
+	public Item byId(int id) throws SQLException {
+		String sql = "SELECT id, name, unit_price, quantity_available " + "FROM item "
+				+ "WHERE id = ? AND is_deleted = 0";
+
+		try (Connection conn = DbConnectionFactory.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setInt(1, id);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					Item item = new Item();
+					item.setId(rs.getInt("id"));
+					item.setName(rs.getString("name"));
+					item.setUnitPrice(rs.getDouble("unit_price"));
+					item.setQuantityAvailable(rs.getInt("quantity_available"));
+					return item;
+				}
+				return null;
+			}
 		}
 	}
 
