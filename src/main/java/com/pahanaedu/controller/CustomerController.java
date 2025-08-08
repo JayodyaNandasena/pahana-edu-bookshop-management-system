@@ -22,7 +22,7 @@ import com.pahanaedu.util.Validator;
 @WebServlet("/customer")
 public class CustomerController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	
+
 	private CustomerService customerService;
 
 	public CustomerController() {
@@ -36,6 +36,13 @@ public class CustomerController extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
+		if (request.getParameter("mobile") != null) {
+			String mobile = request.getParameter("mobile");
+			handleSearchByMobile(mobile, request, response);
+			return;
+		}
+
 		response.sendRedirect(request.getContextPath() + "/customers");
 	}
 
@@ -43,13 +50,6 @@ public class CustomerController extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String action = request.getParameter("action");
-
-		if ("searchByMobile".equals(action)) {
-			String mobile = request.getParameter("mobile");
-			request.setAttribute("mobile", mobile);
-			handleSearchByMobile(mobile, request, response);
-			return;
-		}
 
 		if ("update".equals(action)) {
 			handleUpdate(request, response);
@@ -161,18 +161,45 @@ public class CustomerController extends HttpServlet {
 	private void handleSearchByMobile(String mobile, HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+
+			// validate mobile input
+			HashMap<String, String> errors = new HashMap<String, String>();
+
+			if (!Validator.isValidPhoneNumber(mobile)) {
+				errors.put("mobileError", "Phone number must be a valid Sri Lankan mobile number (e.g., 0771234567).");
+			}
+
+			if (!errors.isEmpty()) {
+				writeJsonErrors(response, errors);
+				return;
+			}
+
+			// customer search if no input errors
 			Customer customer = customerService.getByMobile(mobile);
 
 			if (customer == null) {
-				request.setAttribute("errorMessage", "Customer not found with the provided mobile number.");
+				errors.put("mobileError","No Customer Found.");
+				writeJsonErrors(response, errors);
 			} else {
-				request.setAttribute("customer", customer);
+				JSONObject jsonResponse = new JSONObject();
+				JSONObject customerJson = new JSONObject();
+
+				customerJson.put("id", customer.getId());
+				customerJson.put("firstName", customer.getFirstName());
+				customerJson.put("lastName", customer.getLastName());
+				customerJson.put("email", customer.getEmail());
+
+				jsonResponse.put("success", true);
+				jsonResponse.put("customer", customerJson);
+
+				response.setContentType("application/json");
+				response.getWriter().write(jsonResponse.toString());
 			}
 		} catch (SQLException e) {
-			request.setAttribute("errorMessage", "An error occurred while searching: " + e.getMessage());
+			writeJsonError(response, "No Customer Found.");
 		}
-
-		request.getRequestDispatcher("/WEB-INF/views/bill.jsp").include(request, response);
 	}
 
 	private void handleCustomerCreate(String firstName, String lastName, String phone, String email, String address,
@@ -183,8 +210,8 @@ public class CustomerController extends HttpServlet {
 
 		// If validation errors exist, return them as JSON response
 		if (!errors.isEmpty()) {
-		    writeJsonErrors(response, errors);
-		    return;
+			writeJsonErrors(response, errors);
+			return;
 		}
 
 		try {
@@ -217,8 +244,8 @@ public class CustomerController extends HttpServlet {
 			}
 
 			// Return errors if persistence fails due to known constraints
-			writeJsonErrors(response, errors);	
-			
+			writeJsonErrors(response, errors);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			// Return a generic error message on unexpected exceptions
@@ -259,19 +286,19 @@ public class CustomerController extends HttpServlet {
 	}
 
 	private void writeJsonErrors(HttpServletResponse response, Map<String, String> errors) throws IOException {
-	    JSONObject jsonResponse = new JSONObject();
-	    jsonResponse.put("success", false);
-	    jsonResponse.put("errors", new JSONObject(errors)); // converts Map to JSON object automatically
+		JSONObject jsonResponse = new JSONObject();
+		jsonResponse.put("success", false);
+		jsonResponse.put("errors", new JSONObject(errors)); // converts Map to JSON object automatically
 
-	    response.getWriter().write(jsonResponse.toString());
+		response.getWriter().write(jsonResponse.toString());
 	}
-	
-	private void writeJsonError(HttpServletResponse response, String message) throws IOException {
-	    JSONObject jsonResponse = new JSONObject();
-	    jsonResponse.put("success", false);
-	    jsonResponse.put("message", message);
 
-	    response.getWriter().write(jsonResponse.toString());
+	private void writeJsonError(HttpServletResponse response, String message) throws IOException {
+		JSONObject jsonResponse = new JSONObject();
+		jsonResponse.put("success", false);
+		jsonResponse.put("message", message);
+
+		response.getWriter().write(jsonResponse.toString());
 	}
 
 }

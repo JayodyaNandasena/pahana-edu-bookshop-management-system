@@ -61,7 +61,7 @@ public class CustomerDao {
 	public Customer getByMobile(String mobile) throws SQLException {
 		Customer customer = null;
 
-		String sql = "SELECT id, first_name, last_name FROM customer WHERE phone = ? AND is_active = 1";
+		String sql = "SELECT id, first_name, last_name, email FROM customer WHERE phone = ? AND is_active = 1";
 
 		Connection conn = DbConnectionFactory.getConnection();
 		PreparedStatement stmt = conn.prepareStatement(sql);
@@ -73,7 +73,8 @@ public class CustomerDao {
 			int id = resultSet.getInt("id");
 			String firstName = resultSet.getString("first_name");
 			String lastName = resultSet.getString("last_name");
-			customer = new Customer(id, firstName, lastName);
+			String email = resultSet.getString("email");
+			customer = new Customer(id, firstName, lastName, email);
 		}
 
 		return customer;

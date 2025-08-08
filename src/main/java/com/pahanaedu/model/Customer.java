@@ -29,10 +29,11 @@ public class Customer {
 		this.bills = bills;
 	}
 
-	public Customer(int id, String firstName, String lastName) {
+	public Customer(int id, String firstName, String lastName, String email) {
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
+		this.email = email;
 	}
 
 	public int getId() {
@@ -105,6 +106,13 @@ public class Customer {
 
 	public void setBills(List<Bill> bills) {
 		this.bills = bills;
+	}
+
+	@Override
+	public String toString() {
+		return "Customer [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
+				+ ", phone=" + phone + ", address=" + address + ", unitsConsumed=" + unitsConsumed + ", isActive="
+				+ isActive + ", bills=" + bills + "]";
 	}
 
 }

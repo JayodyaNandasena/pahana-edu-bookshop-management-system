@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <link rel="stylesheet" type="text/css"
 	href="/bookshopManagement/assets/css/bill.css">
@@ -33,44 +33,41 @@
 						</button>
 					</div>
 					<div class="p-6 pt-3 pb-6">
-					<form method="POST" action="${pageContext.request.contextPath}/customer?action=searchByMobile">
-						<div class="mb-6">
-							<label for="customerSearch"
-								class="block text-sm font-medium text-gray-700 mb-2">Search
-								Customer</label>
-							<div class="relative">
-								<input type="text" name="mobile"
-									value="${mobile != null ? mobile : ''}"
-									placeholder="Enter mobile number (e.g., 0700000000)"
-									class="px-4 py-3" id="customerSearch">
-								<button
-									type="submit"
-									class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-500 hover:text-blue-700 p-2">
-									<i class="fas fa-search"></i>
-								</button>
+						<form method="get" action="customer" id="search-customer-form">
+							<div class="mb-6">
+								<label for="customerSearch"
+									class="block text-sm font-medium text-gray-700 mb-2">Search
+									Customer</label>
+								<div class="relative">
+									<input type="text" name="mobile"
+										placeholder="Enter mobile number (e.g., 0700000000)"
+										class="px-4 py-3" id="customerSearch">
+									<button type="submit"
+										class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-500 hover:text-blue-700 p-2">
+										<i class="fas fa-search"></i>
+									</button>
+								</div>
+								<p class="text-red-500 text-sm mt-1 ml-1" id="mobileError"></p>
 							</div>
-							<c:if test="${not empty errorMessage}">
-								<p class="text-red-500 text-sm mt-1 ml-1">${errorMessage}</p>
-							</c:if>
-						</div>
 
-						<div class="grid grid-cols-2 gap-4 mb-6">
-							<div>
-								<label class="block text-sm font-medium text-gray-700 mb-2">Customer
-									ID</label> <input type="text" value="${customer != null ? customer.id : ''}" class="px-4 py-3" readonly
-									disabled />
+							<div class="grid grid-cols-2 gap-4 mb-6">
+								<div>
+									<label class="block text-sm font-medium text-gray-700 mb-2">Customer
+										ID</label> <input type="text" id="customerId" class="px-4 py-3"
+										readonly disabled />
+								</div>
+								<div>
+									<label class="block text-sm font-medium text-gray-700 mb-2">Customer
+										Name</label> <input type="text" id="customerName" class="px-4 py-3"
+										readonly disabled>
+								</div>
 							</div>
-							<div>
-								<label class="block text-sm font-medium text-gray-700 mb-2">Customer
-									Name</label> <input type="text" value="${customer != null ? customer.firstName.concat(' ').concat(customer.lastName) : ''}" class="px-4 py-3" readonly
-									disabled>
-							</div>
-						</div>
 						</form>
 
 						<div class="flex">
-							<button
-								class="btn-confirm flex-1 py-3 rounded-xl font-medium transition-all flex items-center justify-center space-x-2">
+							<button id="btn-confirm-customer"
+								class="btn-confirm flex-1 py-3 rounded-xl font-medium transition-all flex items-center justify-center space-x-2"
+								disabled>
 								<i class="fas fa-check"></i> <span>Confirm Customer</span>
 							</button>
 						</div>
@@ -89,20 +86,21 @@
 					<div class="px-6 pt-3 pb-6">
 						<!-- Add Item Form -->
 						<div
-							class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+							class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6 p-6 bg-blue-50 rounded-xl border border-blue-200">
 							<div class="md:col-span-2">
 								<label class="block text-sm font-semibold text-gray-700 mb-3">Item
-									ID</label> <input id="itemId" class="px-4 py-3"
-									placeholder="eg: ITM00001">
+									ID</label> <input id="item-id" class="px-4 py-3 border-gray-400"
+									placeholder="eg: ITM00001" disabled>
 							</div>
 							<div class="md:col-span-2">
 								<label class="block text-sm font-semibold text-gray-700 mb-3">Quantity</label>
-								<input type="number" id="itemQuantity" placeholder="0" min="1"
-									class="px-4 py-3">
+								<input type="number" id="item-quantity" placeholder="0" min="1"
+									class="px-4 py-3 border-gray-400" disabled>
 							</div>
 							<div class="flex items-end">
-								<button id="addItemBtn"
-									class="btn-primary w-full py-3 rounded-xl font-semibold transition-all duration-300 pulse-ring">
+								<button id="btn-add-bill-item"
+									class="btn-primary w-full py-3 rounded-xl font-semibold transition-all duration-300 pulse-ring"
+									disabled>
 									<!-- <i class="fas fa-plus mr-2"></i> -->
 									Add
 								</button>
@@ -136,11 +134,13 @@
 						<div
 							class="flex justify-between mt-6 pt-6 border-t-2 border-gray-200">
 							<button id="clearAllBtn"
-								class="px-6 py-3 bg-red-100 text-red-700 rounded-xl font-semibold hover:bg-red-200 transition-all duration-300 flex items-center space-x-2">
+								class="px-6 py-3 bg-red-100 text-red-700 rounded-xl font-semibold hover:bg-red-200 transition-all duration-300 flex items-center space-x-2"
+								disabled>
 								<i class="fas fa-trash"></i> <span>Clear All Items</span>
 							</button>
 							<button id="generateBillBtn"
-								class="btn-confirm px-8 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+								class="btn-confirm px-8 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2"
+								disabled>
 								<i class="fas fa-file-invoice-dollar"></i> <span>Generate
 									Bill</span>
 							</button>
@@ -159,7 +159,8 @@
 							<i class="fas fa-file-invoice mr-3"></i> Bill Preview
 						</h2>
 						<button
-							class="btn-primary px-4 py-2 rounded-lg text-sm flex items-center space-x-2">
+							class="btn-primary px-4 py-2 rounded-lg text-sm flex items-center space-x-2"
+							disabled>
 							<i class="fas fa-download"></i> <span>PDF</span>
 						</button>
 					</div>
@@ -178,9 +179,8 @@
 						<div class="grid grid-cols-2 gap-4 mb-6 text-sm">
 							<div>
 								<p class="text-gray-500 font-semibold">Bill To:</p>
-								<p class="font-bold text-gray-800" id="previewCustomerName">John
-									Doe</p>
-								<p class="text-gray-600" id="previewCustomerId">CUST001</p>
+								<p class="font-bold text-gray-800" id="previewCustomerName"></p>
+								<p class="text-gray-600" id="previewCustomerEmail"></p>
 							</div>
 							<div>
 								<p class="text-gray-500 font-semibold">Date & Time:</p>
@@ -226,6 +226,8 @@
 
 </div>
 
+<script type="text/javascript"
+	src="/bookshopManagement/assets/js/bill.js"></script>
 <script type="text/javascript"
 	src="/bookshopManagement/assets/js/dialog-controller.js"></script>
 
