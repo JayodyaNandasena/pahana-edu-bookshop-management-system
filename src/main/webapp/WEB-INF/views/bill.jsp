@@ -143,8 +143,10 @@
 						<!-- Action Buttons -->
 						<div
 							class="flex justify-between mt-6 pt-6 border-t-2 border-gray-200">
-							<button data-dialog-open="clear-items-confirmation-modal"
-								class="px-6 py-3 bg-red-100 text-red-700 rounded-xl font-semibold hover:bg-red-200 transition-all duration-300 flex items-center space-x-2">
+							<button id="btn-clear-all-pseudo"
+								data-dialog-open="clear-items-confirmation-modal"
+								class="px-6 py-3 bg-red-100 text-red-700 rounded-xl font-semibold hover:bg-red-200 transition-all duration-300 flex items-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
+								disabled>
 								<i class="fas fa-trash"></i> <span>Clear All Items</span>
 							</button>
 							<button id="btn-generate-bill"
@@ -167,7 +169,7 @@
 						<h2 class="text-lg font-semibold flex items-center">
 							<i class="fas fa-file-invoice mr-3"></i> Bill Preview
 						</h2>
-						<button
+						<button id="btn-pdf"
 							class="btn-primary px-4 py-2 rounded-lg text-sm flex items-center space-x-2"
 							disabled>
 							<i class="fas fa-download"></i> <span>PDF</span>
@@ -205,6 +207,9 @@
 							</div>
 							<div id="previewItems" class="space-y-2">
 								<!-- Items will be populated here -->
+							</div>
+							<div id="emptyPreviewItemState" class="mt-6">
+								<p class="text-gray-500 text-center py-4">No items added</p>
 							</div>
 						</div>
 
@@ -249,9 +254,9 @@
 			</div>
 			<h3 class="text-xl font-bold text-red-700">Confirm Clear Items</h3>
 		</div>
-		<button type="button" id="delete-close-btn"
+		<button type="button"
 			class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
-			aria-label="Close delete modal">
+			data-dialog-close>
 			<i class="fas fa-times text-gray-500"></i>
 		</button>
 	</div>
@@ -266,9 +271,9 @@
 			<input type="hidden" name="action" value="delete" /> <input
 				type="hidden" name="itemId" id="delete-item-id" />
 
-			<button type="button" id="cancel-delete-btn"
-				class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition">
-				Cancel</button>
+			<button type="button"
+				class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition"
+				data-dialog-close>Cancel</button>
 
 			<button id="btn-clear-all"
 				class="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg px-6 py-3 transition-transform transform hover:scale-[1.02] active:scale-[0.98]">

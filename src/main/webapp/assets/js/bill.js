@@ -122,6 +122,8 @@ function addItem(event, form) {
 				updatePreview();
 				document.getElementById("btn-generate-bill").disabled = false;
 
+				form.reset();
+
 			} else if (!data.success) {
 				if (data.errors) {
 					for (const [key, msg] of Object.entries(data.errors)) {
@@ -152,10 +154,17 @@ function updateItemsList() {
 	if (billItems.length === 0) {
 		itemsList.innerHTML = '';
 		emptyState.style.display = 'block';
+		document.getElementById("btn-generate-bill").disabled = true;
+		document.getElementById("btn-clear-all-pseudo").disabled = true;
 		return;
 	}
 
-	emptyState.style.display = 'none';
+	if (billItems.length === 1) {
+		emptyState.style.display = 'none';
+		document.getElementById("btn-generate-bill").disabled = false;
+		document.getElementById("btn-clear-all-pseudo").disabled = false;
+	}
+
 	itemsList.innerHTML = billItems.map((item, index) => `
 		<div class="px-6 py-4 hover:bg-blue-50 transition-colors fade-in">
 			<div class="grid grid-cols-10 gap-4 items-center">
@@ -181,26 +190,30 @@ function removeItem(index) {
 }
 
 function clearAllItems() {
-	console.log("here 2");
 	if (billItems.length > 0) {
 		billItems = [];
 		updateItemsList();
 		updatePreview();
+		document.getElementById("clear-items-confirmation-modal").close();
 	}
 }
 
 function updatePreview() {
 	const previewItems = document.getElementById('previewItems');
 	const previewTotal = document.getElementById('previewTotal');
-	const invoiceNumber = document.getElementById('invoiceNumber');
-
-	// Remove or define invoiceNumber properly
-	invoiceNumber.textContent = ''; // or remove this line
+	//const invoiceNumber = document.getElementById('invoiceNumber');
+	const emptyItemState = document.getElementById('emptyPreviewItemState');
 
 	if (billItems.length === 0) {
-		previewItems.innerHTML = '<p class="text-gray-500 text-center py-4">No items added</p>';
+		emptyItemState.style.display = 'block';
+		previewItems.innerText = '';
 		previewTotal.textContent = '0.00';
+		document.getElementById("btn-pdf").disabled = true;
 		return;
+	}
+
+	if (billItems.length === 1) {
+		emptyItemState.style.display = 'none';
 	}
 
 	const total = billItems.reduce((sum, item) => sum + item.total, 0);
