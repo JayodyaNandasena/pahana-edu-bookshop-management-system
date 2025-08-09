@@ -1,5 +1,6 @@
 let selectedCustomer = null;
 let billItems = [];
+let total = 0;
 
 document.addEventListener("DOMContentLoaded", function() {
 	// seach customer
@@ -20,6 +21,11 @@ document.addEventListener("DOMContentLoaded", function() {
 	// clear items list
 	document.getElementById("btn-clear-all").addEventListener("click", function() {
 		clearAllItems();
+	});
+
+	// create bill
+	document.getElementById("btn-generate-bill").addEventListener("click", function(event) {
+		createBill();
 	});
 
 });
@@ -214,7 +220,7 @@ function updatePreview() {
 		emptyItemState.style.display = 'none';
 	}
 
-	const total = billItems.reduce((sum, item) => sum + item.total, 0);
+	total = billItems.reduce((sum, item) => sum + item.total, 0);
 
 	previewItems.innerHTML = billItems.map(item => `
 		<div class="flex justify-between text-sm">
@@ -224,5 +230,86 @@ function updatePreview() {
 	`).join('');
 
 	previewTotal.textContent = `${total.toFixed(2)}`;
+}
+
+function createBill() {
+	// Prepare items array with only needed fields
+	const filteredItems = billItems.map(item => ({
+		id: item.id,
+		quantity: item.quantity,
+		unitPrice: item.unitPrice,
+		total: item.total
+	}));
+
+	// Get Sri Lanka time
+	const now = new Date();
+	const optionsDate = { timeZone: 'Asia/Colombo', year: 'numeric', month: '2-digit', day: '2-digit' };
+	const optionsTime = { timeZone: 'Asia/Colombo', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+
+	// Format date to YYYY-MM-DD
+	const [month, day, year] = now.toLocaleDateString('en-GB', optionsDate).split('/');
+	const date = `${year}-${month}-${day}`;
+
+	// Format time to HH:MM:SS
+	const time = now.toLocaleTimeString('en-GB', optionsTime);
+
+	// Validate inputs
+	if (!selectedCustomer || !selectedCustomer.id) {
+		alert("Customer is not selected or missing ID");
+		return;
+	}
+
+	if (filteredItems.length === 0) {
+		alert("No items added to the bill.");
+		return;
+	}
+	if (total <= 0) {
+		alert("Total amount must be greater than zero.");
+		return;
+	}
+	if (!date || !time) {
+		alert("Invalid date or time.");
+		return;
+	}
+
+	// Create the bill object
+	var bill = {
+		customerId: selectedCustomer.id,
+		items: filteredItems,
+		date: date,
+		time: time,
+		total: total,
+		cashierId: 1 // TODO: replace with actual user ID
+	};
+
+	// Send the bill to the server
+	fetch("/bill", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json;charset=UTF-8"
+		},
+		body: JSON.stringify(bill)
+	})
+		.then(response => {
+			if (!response.ok) {
+				throw new Error("Network response was not ok");
+			}
+			return response.json();
+		})
+		.then(data => {
+			if (data.success) {
+				alert(data.message || "Bill added successfully!");
+			} else if (data.errors) {
+				for (const [key, msg] of Object.entries(data.errors)) {
+					const el = document.getElementById(key);
+					if (el) el.textContent = msg;
+				}
+			} else {
+				alert("An error occurred while creating the bill.");
+			}
+		})
+		.catch(error => {
+			alert("There was a problem creating the bill: " + error.message);
+		});
 }
 
