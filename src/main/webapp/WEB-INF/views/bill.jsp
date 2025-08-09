@@ -283,6 +283,8 @@
 </div>
 </dialog>
 
+<script
+	src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script type="text/javascript"
 	src="/bookshopManagement/assets/js/bill.js"></script>
 <script type="text/javascript"
