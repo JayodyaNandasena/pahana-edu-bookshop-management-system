@@ -106,7 +106,20 @@ function addItem(event, form) {
 	event.preventDefault();
 
 	const formData = new FormData(form);
-	const params = new URLSearchParams(formData).toString();
+	const id = formData.get("id");
+	const quantity = parseInt(formData.get("quantity"), 10);
+
+	let params = new URLSearchParams(formData).toString();
+	let existingItemIndex = -1;
+
+	if (billItems.length > 0) {
+		const existingItem = checkItemExists(id, quantity);
+		if (existingItem !== null) {
+			params = existingItem.queryParams;
+			existingItemIndex = existingItem.existingItemIndex;
+		}
+	}
+
 	const urlWithParams = `${form.action}?${params}`;
 
 	fetch(urlWithParams, {
@@ -126,14 +139,21 @@ function addItem(event, form) {
 			});
 
 			if (data.success && data.item) {
-				billItems.push(data.item);
+				if (existingItemIndex !== -1) {
+					// Update the existing item with new data from backend
+					billItems[existingItemIndex] = data.item;
+				} else {
+					// Add new item if not exists
+					billItems.push(data.item);
+				}
+
 				updateItemsList();
 				updatePreview();
 				document.getElementById("btn-generate-bill").disabled = false;
-
 				form.reset();
 
 			} else if (!data.success) {
+				// Show validation errors from backend
 				if (data.errors) {
 					for (const [key, msg] of Object.entries(data.errors)) {
 						const el = document.getElementById(key);
@@ -146,7 +166,6 @@ function addItem(event, form) {
 				}
 
 				document.getElementById("btn-generate-bill").disabled = true;
-
 			} else {
 				alert("An error occurred while searching the item.");
 			}
@@ -154,6 +173,22 @@ function addItem(event, form) {
 		.catch(error => {
 			alert("There was a problem searching the item: " + error.message);
 		});
+}
+
+function checkItemExists(id, quantity) {
+	const existingItemIndex = billItems.findIndex(item => item.id == id);
+
+	if (existingItemIndex !== -1) {
+		const existingItem = billItems[existingItemIndex];
+		const combinedQuantity = existingItem.quantity + quantity;
+
+		return {
+			existingItemIndex,
+			queryParams: `id=${id}&quantity=${combinedQuantity}`
+		};
+	}
+
+	return null;
 }
 
 function updateItemsList() {
