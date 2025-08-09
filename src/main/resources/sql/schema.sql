@@ -48,11 +48,13 @@ CREATE TABLE user (
 -- ==== BILL ==== 
 CREATE TABLE bill (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(100),
     customer_id BIGINT NOT NULL,
     cashier_id BIGINT NOT NULL,
     bill_date DATE NOT NULL,
     bill_time TIME NOT NULL,
     total DECIMAL(12,2) NOT NULL,
+    UNIQUE KEY bill_code_unique (code),
     CONSTRAINT chk_total_nonnegative CHECK (total >= 0),
     CONSTRAINT fk_bill_customer FOREIGN KEY (customer_id)
         REFERENCES customer(id)

@@ -6,6 +6,8 @@ import java.util.List;
 import com.pahanaedu.dao.ItemDao;
 import com.pahanaedu.model.Item;
 import com.pahanaedu.model.enums.PersistResult;
+import com.pahanaedu.service.exception.InsufficientStockException;
+import com.pahanaedu.service.exception.ItemNotFoundException;
 
 public class ItemService {
 	private static ItemService instance;
@@ -36,6 +38,20 @@ public class ItemService {
 
 	public List<Item> byIdOrName(String searchTerm) throws SQLException {
 		return itemDao.byIdOrName(searchTerm);
+	}
+	
+	public Item byId(int id, int quantity) throws SQLException {
+		Item item = itemDao.byId(id);
+		
+		if(item == null) {
+			throw new ItemNotFoundException();
+		}
+		
+		if(quantity > item.getQuantityAvailable()) {
+			throw new InsufficientStockException();
+		}
+		
+		return item;
 	}
 
 	public boolean delete(int itemId) {

@@ -28,10 +28,12 @@
 		<description></description>
 		<servlet-class>com.pahanaedu.controller.ItemController</servlet-class>
 	</servlet>
-	<servlet-mapping>
-		<servlet-name>ItemController</servlet-name>
-		<url-pattern>/ItemController</url-pattern>
-	</servlet-mapping>
+	<servlet>
+		<servlet-name>BillController</servlet-name>
+		<display-name>BillController</display-name>
+		<description></description>
+		<servlet-class>com.pahanaedu.controller.BillController</servlet-class>
+	</servlet>
 	<!-- Not Found Error -->
 	<error-page>
 		<error-code>404</error-code>

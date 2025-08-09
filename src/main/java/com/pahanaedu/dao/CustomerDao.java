@@ -47,21 +47,10 @@ public class CustomerDao {
 		}
 	}
 
-	// Helper method to detect unique constraint violations
-	private boolean isUniqueConstraintViolation(SQLException e) {
-		String sqlState = e.getSQLState();
-		int errorCode = e.getErrorCode();
-
-		// MySQL specific codes for unique constraint violations:
-		// - Error code 1062: Duplicate entry for key
-		// - SQL state 23000: Integrity constraint violation
-		return errorCode == 1062 || "23000".equals(sqlState);
-	}
-
 	public Customer getByMobile(String mobile) throws SQLException {
 		Customer customer = null;
 
-		String sql = "SELECT id, first_name, last_name FROM customer WHERE phone = ? AND is_active = 1";
+		String sql = "SELECT id, first_name, last_name, email FROM customer WHERE phone = ? AND is_active = 1";
 
 		Connection conn = DbConnectionFactory.getConnection();
 		PreparedStatement stmt = conn.prepareStatement(sql);
@@ -73,7 +62,8 @@ public class CustomerDao {
 			int id = resultSet.getInt("id");
 			String firstName = resultSet.getString("first_name");
 			String lastName = resultSet.getString("last_name");
-			customer = new Customer(id, firstName, lastName);
+			String email = resultSet.getString("email");
+			customer = new Customer(id, firstName, lastName, email);
 		}
 
 		return customer;
@@ -196,5 +186,31 @@ public class CustomerDao {
 			System.err.println("Database error: " + e.getMessage());
 			return PersistResult.OTHER_ERROR;
 		}
+	}
+
+	public void increaseUnitsConsumed(int id, int unitsConsumed, Connection conn) throws SQLException {
+		String sql = "UPDATE customer SET units_consumed = units_consumed + ? WHERE id = ?";
+
+	    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        stmt.setInt(1, unitsConsumed);
+	        stmt.setInt(2, id);
+
+	        int rowsAffected = stmt.executeUpdate();
+
+	        if (rowsAffected == 0) {
+	            throw new SQLException("Updating units consumed failed: no customer found with id " + id);
+	        }
+	    }
+	}
+
+	// Helper method to detect unique constraint violations
+	private boolean isUniqueConstraintViolation(SQLException e) {
+		String sqlState = e.getSQLState();
+		int errorCode = e.getErrorCode();
+
+		// MySQL specific codes for unique constraint violations:
+		// - Error code 1062: Duplicate entry for key
+		// - SQL state 23000: Integrity constraint violation
+		return errorCode == 1062 || "23000".equals(sqlState);
 	}
 }
