@@ -338,6 +338,8 @@ function createBill() {
 				document.getElementById("previewDateTime").innerText = `${date} ${time}`;
 				document.getElementById("btn-pdf").disabled = false;
 				alert(data.message || "Bill added successfully!");
+
+				sendBillEmail(date, time);
 			} else if (data.errors) {
 				for (const [key, msg] of Object.entries(data.errors)) {
 					const el = document.getElementById(key);
@@ -350,6 +352,56 @@ function createBill() {
 		.catch(error => {
 			alert("There was a problem creating the bill: " + error.message);
 		});
+}
+
+function sendBillEmail(date, time) {
+	if (!selectedCustomer || selectedCustomer.email.trim() === '') {
+		alert('Customer email not found');
+		return;
+	}
+
+	const invoiceNumber = document.getElementById('invoiceNumber').textContent || 'Invoice';
+	const subject = `${invoiceNumber} - Pahana Edu Bookshop`;
+
+	const billPreview = document.getElementById('bill-preview');
+	if (!billPreview) {
+		alert('Bill preview not found');
+		return;
+	}
+
+	console.log(date);
+	console.log(time);
+
+	// Use html2canvas to convert to canvas
+	html2canvas(billPreview).then(canvas => {
+		// Convert canvas to base64 PNG string
+		const base64Image = canvas.toDataURL('image/png');
+
+		// Send data as JSON including image base64 string
+		fetch('send-email', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				to: selectedCustomer.email,
+				subject: subject,
+				date: date,
+				time: time,
+				imageBase64: base64Image  // send image as base64
+			})
+		})
+			.then(response => response.json())
+			.then(data => {
+				if (data.status === 'success') {
+					alert('Bill email sent successfully to ' + selectedCustomer.email);
+				} else {
+					alert('Failed to send email: ' + (data.message || 'Unknown error'));
+				}
+			})
+			.catch(error => {
+				alert('Error sending email: ' + error.message);
+				console.error('Error:', error);
+			});
+	});
 }
 
 function printBill() {
