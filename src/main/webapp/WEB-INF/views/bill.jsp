@@ -182,8 +182,7 @@
 								<img src="/bookshopManagement/assets/images/logo.png"
 									alt="Pahana Edu" class="h-10 w-auto">
 							</div>
-							<p class="text-lg font-semibold text-blue-600" id="invoiceNumber">Invoice
-								#003</p>
+							<p class="text-lg font-semibold text-blue-600" id="invoiceNumber"></p>
 						</div>
 
 						<!-- Customer & Date Info -->

@@ -51,7 +51,7 @@ public class BillService {
 		return null;
 	}
 
-	public PersistResult persist(int customerId, JSONArray itemsJsonArray, String date, String time, double total,
+	public Bill persist(int customerId, JSONArray itemsJsonArray, String date, String time, double total,
 			int cashierId) throws SQLException {
 		int unitsConsumed = 0;
 		List<BillItem> billItems = new ArrayList<>();
@@ -84,11 +84,11 @@ public class BillService {
 			conn.setAutoCommit(false);
 			
 			// 1. Add bill
-            int billId = billDao.persist(bill, conn);
+            Bill savedBill = billDao.persist(bill, conn);
 
             // 2. Add bill items with billId
             for (BillItem item : billItems) {
-                item.setBill(new Bill(billId));
+                item.setBill(new Bill(savedBill.getId()));
                 billItemDao.persist(item, conn);
             }
 
@@ -102,7 +102,7 @@ public class BillService {
 
             conn.commit();  // Commit transaction
             
-            return PersistResult.SUCCESS;
+            return savedBill;
 		} catch (SQLException e) {
 			if (conn != null) {
                 try {

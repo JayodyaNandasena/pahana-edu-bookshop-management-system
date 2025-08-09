@@ -297,6 +297,9 @@ function createBill() {
 		})
 		.then(data => {
 			if (data.success) {
+				document.getElementById("invoiceNumber").innerText = data.result;
+				document.getElementById("previewDateTime").innerText = `${date} ${time}`;
+				document.getElementById("btn-pdf").disabled = false;
 				alert(data.message || "Bill added successfully!");
 			} else if (data.errors) {
 				for (const [key, msg] of Object.entries(data.errors)) {

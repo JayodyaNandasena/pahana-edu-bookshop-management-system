@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.pahanaedu.model.Bill;
 import com.pahanaedu.model.enums.PersistResult;
 import com.pahanaedu.service.BillService;
 
@@ -73,23 +74,12 @@ public class BillController extends HttpServlet {
 		
 		try {
 			// Attempt to persist customer data and handle result accordingly
-			PersistResult result = billService.persist(customerId, items, date, time, total, cashierId);
+			Bill bill = billService.persist(customerId, items, date, time, total, cashierId);
 
-			switch (result) {
-			case SUCCESS:
-				// Success - send JSON success message
-				writeJsonSuccess(response, "Bill created successfully.");
+			if(bill != null) {
+				writeJsonSuccess(response, "Bill created successfully.", bill.getCode());
 				return;
-
-			case OTHER_ERROR:
-				errors.put("generalError", "Failed to create bill. Please try again.");
-				break;
-
-			default:
-				// Handle unexpected result
-				writeJsonError(response, "Unexpected error occurred.");
-				return;
-			}
+			}			
 
 			// Return errors if persistence fails due to known constraints
 			writeJsonErrors(response, errors);
@@ -102,10 +92,11 @@ public class BillController extends HttpServlet {
 	}
 
 	// helper methods for success and error JSON responses using JSONObject
-	private void writeJsonSuccess(HttpServletResponse response, String message) throws IOException {
+	private void writeJsonSuccess(HttpServletResponse response, String message, String code) throws IOException {
 		JSONObject jsonResponse = new JSONObject();
 		jsonResponse.put("success", true);
 		jsonResponse.put("message", message);
+		jsonResponse.put("result", code);
 
 		response.getWriter().write(jsonResponse.toString());
 	}
