@@ -36,6 +36,10 @@ public class Customer {
 		this.email = email;
 	}
 
+	public Customer(int id) {
+		this.id = id;
+	}
+
 	public int getId() {
 		return id;
 	}

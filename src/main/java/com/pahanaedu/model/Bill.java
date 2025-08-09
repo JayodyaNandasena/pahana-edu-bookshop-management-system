@@ -27,6 +27,10 @@ public class Bill {
 		this.billItems = billItems;
 	}
 
+	public Bill(int id) {
+		this.id = id;
+	}
+
 	public long getId() {
 		return id;
 	}

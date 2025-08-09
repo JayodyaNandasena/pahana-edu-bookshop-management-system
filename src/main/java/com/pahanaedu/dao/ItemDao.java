@@ -10,6 +10,7 @@ import java.util.List;
 import com.pahanaedu.model.Category;
 import com.pahanaedu.model.Item;
 import com.pahanaedu.model.enums.PersistResult;
+import com.pahanaedu.service.exception.ItemNotFoundException;
 import com.pahanaedu.util.DbConnectionFactory;
 
 public class ItemDao {
@@ -185,6 +186,21 @@ public class ItemDao {
 		}
 	}
 
+	public void reduceQuantity(int id, int quantity, Connection conn) throws SQLException {
+		String sql = "UPDATE item SET quantity_available = quantity_available - ? WHERE id = ?";
+
+	    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        stmt.setInt(1, quantity);
+	        stmt.setInt(2, id);
+
+	        int rowsAffected = stmt.executeUpdate();
+
+	        if (rowsAffected == 0) {
+	            throw new ItemNotFoundException("Reducing quantity failed: no item found with id " + id);
+	        }
+	    }
+	}	
+	
 	// Helper method to detect unique constraint violations
 	private boolean isUniqueConstraintViolation(SQLException e) {
 		String sqlState = e.getSQLState();
@@ -195,5 +211,7 @@ public class ItemDao {
 		// - SQL state 23000: Integrity constraint violation
 		return errorCode == 1062 || "23000".equals(sqlState);
 	}
+
+	
 
 }

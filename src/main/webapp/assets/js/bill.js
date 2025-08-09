@@ -238,7 +238,6 @@ function createBill() {
 		id: item.id,
 		quantity: item.quantity,
 		unitPrice: item.unitPrice,
-		total: item.total
 	}));
 
 	// Get Sri Lanka time
@@ -283,7 +282,7 @@ function createBill() {
 	};
 
 	// Send the bill to the server
-	fetch("/bill", {
+	fetch("/bookshopManagement/bills", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json;charset=UTF-8"
