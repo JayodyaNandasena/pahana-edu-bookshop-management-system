@@ -149,7 +149,6 @@ function addItem(event, form) {
 
 				updateItemsList();
 				updatePreview();
-				document.getElementById("btn-generate-bill").disabled = false;
 				form.reset();
 
 			} else if (!data.success) {
@@ -164,8 +163,6 @@ function addItem(event, form) {
 				if (data.message) {
 					document.getElementById("addItemError").innerText = data.message;
 				}
-
-				document.getElementById("btn-generate-bill").disabled = true;
 			} else {
 				alert("An error occurred while searching the item.");
 			}
