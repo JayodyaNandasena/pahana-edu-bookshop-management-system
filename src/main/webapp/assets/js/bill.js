@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	// clear items list
 	document.getElementById("btn-clear-all").addEventListener("click", function() {
-		console.log("here");
 		clearAllItems();
 	});
 
@@ -82,7 +81,6 @@ function searchCustomer(event, form) {
 }
 
 function confirmCustomer() {
-	console.log(selectedCustomer);
 	// Populate fields
 	document.getElementById("previewCustomerEmail").innerText = selectedCustomer.email || "";
 	document.getElementById("previewCustomerName").innerText = `${selectedCustomer.firstName || ""} ${selectedCustomer.lastName || ""}`.trim();
