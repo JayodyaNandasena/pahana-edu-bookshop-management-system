@@ -28,6 +28,11 @@ document.addEventListener("DOMContentLoaded", function() {
 		createBill();
 	});
 
+	// print bill
+	document.getElementById('btn-pdf').addEventListener('click', function() {
+		printBill();
+	});
+
 });
 
 function searchCustomer(event, form) {
@@ -315,3 +320,41 @@ function createBill() {
 		});
 }
 
+function printBill() {
+	const billPreview = document.getElementById('bill-preview').innerHTML;
+	const invoiceNumber = document.getElementById("invoiceNumber").innerText;
+
+	const printWindow = window.open('', '_blank', 'width=800,height=600');
+
+	printWindow.document.write(`
+        <html>
+        <head>
+            <title>${invoiceNumber}</title>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+            <style>
+                @media print {
+                    body {
+                        margin: 10px 50px; /* Bigger margins */
+                    }
+                    #bill-preview {
+                        max-width: 700px; /* Limit content width */
+                        margin: auto;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div id="bill-preview">
+                ${billPreview}
+            </div>
+        </body>
+        </html>
+    `);
+
+	printWindow.document.close();
+
+	printWindow.onload = function() {
+		printWindow.print();
+		printWindow.close();
+	};
+}

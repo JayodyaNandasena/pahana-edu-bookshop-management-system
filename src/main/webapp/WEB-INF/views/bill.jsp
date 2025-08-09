@@ -175,14 +175,14 @@
 							<i class="fas fa-download"></i> <span>PDF</span>
 						</button>
 					</div>
-					<div class="p-6">
+					<div class="p-6" id="bill-preview">
 						<!-- Invoice Header -->
 						<div class="text-center mb-6 pb-4 border-b-2 border-gray-200">
 							<div class="flex items-center justify-center space-x-3 mb-3">
 								<img src="/bookshopManagement/assets/images/logo.png"
 									alt="Pahana Edu" class="h-10 w-auto">
 							</div>
-							<p class="text-lg font-semibold text-blue-600" id="invoiceNumber"></p>
+							<p class="text-md font-semibold text-gray-600" id="invoiceNumber"></p>
 						</div>
 
 						<!-- Customer & Date Info -->
