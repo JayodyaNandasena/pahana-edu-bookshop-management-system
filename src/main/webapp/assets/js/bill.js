@@ -1,3 +1,5 @@
+const btnGenerateBill = document.getElementById("btn-generate-bill");
+
 let selectedCustomer = null;
 let billItems = [];
 let total = 0;
@@ -24,7 +26,12 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 
 	// create bill
-	document.getElementById("btn-generate-bill").addEventListener("click", function(event) {
+	btnGenerateBill.addEventListener("click", function(event) {
+		event.preventDefault(); // Prevent accidental form submit
+		if (btnGenerateBill.disabled) return; // Ignore extra clicks
+
+		btnGenerateBill.disabled = true;
+		btnGenerateBill.textContent = "Processing...";
 		createBill();
 	});
 
@@ -348,18 +355,29 @@ function createBill() {
 				document.getElementById("btn-pdf").disabled = false;
 				toastr.success(data.message || "Bill added successfully!");
 
+				btnGenerateBill.textContent = "Generate Bill";
+				
 				sendBillEmail(date, time);
 			} else if (data.errors) {
 				for (const [key, msg] of Object.entries(data.errors)) {
 					const el = document.getElementById(key);
 					if (el) el.textContent = msg;
 				}
+
+				btnGenerateBill.disabled = false; // Re-enable on failure
+				btnGenerateBill.textContent = "Generate Bill";
 			} else {
 				toastr.error("An error occurred while creating the bill.");
+
+				btnGenerateBill.disabled = false; // Re-enable on failure
+				btnGenerateBill.textContent = "Generate Bill";
 			}
 		})
 		.catch(error => {
 			toastr.error("There was a problem creating the bill: " + error.message);
+
+			btnGenerateBill.disabled = false; // Re-enable on failure
+			btnGenerateBill.textContent = "Generate Bill";
 		});
 }
 
@@ -377,6 +395,9 @@ function sendBillEmail(date, time) {
 		toastr.error('Bill preview not found');
 		return;
 	}
+
+	// Show sending status
+	const sendingToast = toastr.info('Sending bill email...', { timeOut: 0, extendedTimeOut: 0, tapToDismiss: false });
 
 	// Use html2canvas to convert to canvas
 	html2canvas(billPreview).then(canvas => {
@@ -397,6 +418,8 @@ function sendBillEmail(date, time) {
 		})
 			.then(response => response.json())
 			.then(data => {
+				toastr.clear(sendingToast); // Remove "Sending..." toast
+
 				if (data.status === 'success') {
 					toastr.success('Bill email sent successfully to ' + selectedCustomer.email);
 				} else {
