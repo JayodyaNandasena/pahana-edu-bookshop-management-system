@@ -57,7 +57,7 @@ public class EmailService {
 	            "<br>" +
 	            "<div style=\"text-align:center;\">" +
 	            "<img src=\"cid:" + cid + "\" alt=\"Bill Preview\" " +
-	            "style=\"max-width:600px; width:100%; height:auto; border: 2px solid #000; border-radius: 8px;\" />" +
+	            "style=\"max-width:500px; width:100%; height:auto; border: 2px solid #808080; border-radius: 4px;\" />" +
 	            "</div>";
 	        htmlPart.setContent(htmlWithImage, "text/html; charset=utf-8");
 	        relatedMultipart.addBodyPart(htmlPart);
