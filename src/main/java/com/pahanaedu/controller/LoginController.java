@@ -9,7 +9,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import com.pahanaedu.model.User;
 import com.pahanaedu.service.LoginService;
 import com.pahanaedu.util.Validator;
 
@@ -67,7 +69,13 @@ public class LoginController extends HttpServlet {
 	        return;
 	    }
 	    
-	    if(loginService.login(username, password) != null) {
+	    User user = loginService.login(username, password);
+	    
+	    if(user != null) {
+	    	// Authentication success
+            HttpSession session = request.getSession();
+            session.setAttribute("user", user);
+            
 	    	response.sendRedirect(request.getContextPath() + "/dashboard");
 	    	return;
 	    }
