@@ -40,6 +40,11 @@ document.addEventListener("DOMContentLoaded", function() {
 		printBill();
 	});
 
+	// reset for new bill
+	document.getElementById('btn-new-bill').addEventListener('click', function() {
+		resetPage();
+	})
+
 });
 
 function searchCustomer(event, form) {
@@ -356,7 +361,7 @@ function createBill() {
 				toastr.success(data.message || "Bill added successfully!");
 
 				btnGenerateBill.textContent = "Generate Bill";
-				
+
 				sendBillEmail(date, time);
 			} else if (data.errors) {
 				for (const [key, msg] of Object.entries(data.errors)) {
@@ -469,4 +474,8 @@ function printBill() {
 		printWindow.print();
 		printWindow.close();
 	};
+}
+
+function resetPage(){
+	location.reload();
 }
