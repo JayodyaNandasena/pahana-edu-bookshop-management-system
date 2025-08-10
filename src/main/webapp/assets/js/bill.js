@@ -49,7 +49,7 @@ function searchCustomer(event, form) {
 	})
 		.then(response => {
 			if (!response.ok) {
-				throw new Error("Network response was not ok");
+				toastr.error("Network response was not ok");
 			}
 			return response.json();
 		})
@@ -70,6 +70,7 @@ function searchCustomer(event, form) {
 
 				// enable confirm customer button
 				document.getElementById("btn-confirm-customer").disabled = false;
+				toastr.success("Customer found!");
 			} else if (data.errors) {
 				// Show validation errors
 				for (const [key, msg] of Object.entries(data.errors)) {
@@ -83,11 +84,11 @@ function searchCustomer(event, form) {
 				document.getElementById("btn-confirm-customer").disabled = true;
 				selectedCustomer = null;
 			} else {
-				alert("An error occurred while searching the customer.");
+				toastr.error("An error occurred while searching the customer.");
 			}
 		})
 		.catch(error => {
-			alert("There was a problem searching the customer: " + error.message);
+			toastr.error("There was a problem searching the customer: " + error.message);
 		});
 }
 
@@ -100,6 +101,8 @@ function confirmCustomer() {
 	document.getElementById("btn-add-bill-item").disabled = false;
 	document.getElementById("item-id").disabled = false;
 	document.getElementById("item-quantity").disabled = false;
+
+	toastr.success("Customer confirmed!");
 }
 
 function addItem(event, form) {
@@ -127,7 +130,7 @@ function addItem(event, form) {
 	})
 		.then(response => {
 			if (!response.ok) {
-				throw new Error("Network response was not ok");
+				toastr.error("Network response was not ok");
 			}
 			return response.json();
 		})
@@ -164,11 +167,11 @@ function addItem(event, form) {
 					document.getElementById("addItemError").innerText = data.message;
 				}
 			} else {
-				alert("An error occurred while searching the item.");
+				toastr.error("An error occurred while searching the item.");
 			}
 		})
 		.catch(error => {
-			alert("There was a problem searching the item: " + error.message);
+			toastr.error("There was a problem searching the item: " + error.message);
 		});
 }
 
@@ -178,6 +181,8 @@ function checkItemExists(id, quantity) {
 	if (existingItemIndex !== -1) {
 		const existingItem = billItems[existingItemIndex];
 		const combinedQuantity = existingItem.quantity + quantity;
+
+		toastr.info("Item already in bill. Quantity updated and stock will be rechecked.");
 
 		return {
 			existingItemIndex,
@@ -228,6 +233,8 @@ function removeItem(index) {
 	billItems.splice(index, 1);
 	updateItemsList();
 	updatePreview();
+
+	toastr.info("Item removed!");
 }
 
 function clearAllItems() {
@@ -236,6 +243,8 @@ function clearAllItems() {
 		updateItemsList();
 		updatePreview();
 		document.getElementById("clear-items-confirmation-modal").close();
+
+		toastr.info("All items removed!");
 	}
 }
 
@@ -291,20 +300,20 @@ function createBill() {
 
 	// Validate inputs
 	if (!selectedCustomer || !selectedCustomer.id) {
-		alert("Customer is not selected or missing ID");
+		toastr.error("Customer is not selected or missing ID");
 		return;
 	}
 
 	if (filteredItems.length === 0) {
-		alert("No items added to the bill.");
+		toastr.error("No items added to the bill.");
 		return;
 	}
 	if (total <= 0) {
-		alert("Total amount must be greater than zero.");
+		toastr.error("Total amount must be greater than zero.");
 		return;
 	}
 	if (!date || !time) {
-		alert("Invalid date or time.");
+		toastr.error("Invalid date or time.");
 		return;
 	}
 
@@ -328,7 +337,7 @@ function createBill() {
 	})
 		.then(response => {
 			if (!response.ok) {
-				throw new Error("Network response was not ok");
+				toastr.error("Network response was not ok");
 			}
 			return response.json();
 		})
@@ -337,7 +346,7 @@ function createBill() {
 				document.getElementById("invoiceNumber").innerText = data.result;
 				document.getElementById("previewDateTime").innerText = `${date} ${time}`;
 				document.getElementById("btn-pdf").disabled = false;
-				alert(data.message || "Bill added successfully!");
+				toastr.success(data.message || "Bill added successfully!");
 
 				sendBillEmail(date, time);
 			} else if (data.errors) {
@@ -346,17 +355,17 @@ function createBill() {
 					if (el) el.textContent = msg;
 				}
 			} else {
-				alert("An error occurred while creating the bill.");
+				toastr.error("An error occurred while creating the bill.");
 			}
 		})
 		.catch(error => {
-			alert("There was a problem creating the bill: " + error.message);
+			toastr.error("There was a problem creating the bill: " + error.message);
 		});
 }
 
 function sendBillEmail(date, time) {
 	if (!selectedCustomer || selectedCustomer.email.trim() === '') {
-		alert('Customer email not found');
+		toastr.error('Customer email not found');
 		return;
 	}
 
@@ -365,12 +374,9 @@ function sendBillEmail(date, time) {
 
 	const billPreview = document.getElementById('bill-preview');
 	if (!billPreview) {
-		alert('Bill preview not found');
+		toastr.error('Bill preview not found');
 		return;
 	}
-
-	console.log(date);
-	console.log(time);
 
 	// Use html2canvas to convert to canvas
 	html2canvas(billPreview).then(canvas => {
@@ -392,14 +398,13 @@ function sendBillEmail(date, time) {
 			.then(response => response.json())
 			.then(data => {
 				if (data.status === 'success') {
-					alert('Bill email sent successfully to ' + selectedCustomer.email);
+					toastr.success('Bill email sent successfully to ' + selectedCustomer.email);
 				} else {
-					alert('Failed to send email: ' + (data.message || 'Unknown error'));
+					toastr.error('Failed to send email: ' + (data.message || 'Unknown error'));
 				}
 			})
 			.catch(error => {
-				alert('Error sending email: ' + error.message);
-				console.error('Error:', error);
+				toastr.error('Error sending email: ' + error.message);
 			});
 	});
 }
