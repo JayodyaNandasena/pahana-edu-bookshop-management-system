@@ -1,5 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<c:set var="isAdmin" value="${sessionScope.user.userType == 'ADMIN'}" />
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,4 +18,5 @@
 	href="/bookshopManagement/assets/css/styles.css">
 
 </head>
+
 <body class="bg-gray-50 min-h-screen">
