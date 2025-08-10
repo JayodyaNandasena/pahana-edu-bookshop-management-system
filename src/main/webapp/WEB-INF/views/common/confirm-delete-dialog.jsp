@@ -61,9 +61,9 @@
 			button.addEventListener("click", () => {
 				const itemId = button.getAttribute("data-item-id");
 				const itemName = button.getAttribute("data-item-name");
-	
+					
 				itemIdInput.value = itemId;
-				itemNameDisplay.textContent = `"${itemName}"`;
+				itemNameDisplay.textContent = itemName;
 	
 				modal.showModal();
 			});
