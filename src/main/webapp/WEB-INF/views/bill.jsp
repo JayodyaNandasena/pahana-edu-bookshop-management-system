@@ -215,7 +215,7 @@
 						<!-- Total -->
 						<div class="pt-4 border-t-2 border-gray-200">
 							<div class="flex justify-between items-center">
-								<span class="text-xl font-bold text-gray-800">Total
+								<span class="text-l font-bold text-gray-800">Total
 									Amount (Rs.)</span> <span class="text-2xl font-bold text-green-600"
 									id="previewTotal">Rs. 0.00</span>
 							</div>
