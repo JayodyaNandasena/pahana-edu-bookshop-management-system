@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page import="java.net.URLDecoder"%>
+
 <%
 String toastType = null;
 String toastMessage = null;
@@ -59,7 +60,7 @@ if (toastType != null && escapedMessage != null) {
         toastr.options = {
             closeButton: true,
             progressBar: true,
-            positionClass: "toast-bottom-right",
+            positionClass: "toast-top-right",
             timeOut: "5000"
         };
         toastr["<%= toastType %>"]("<%= escapedMessage %>");
