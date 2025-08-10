@@ -192,7 +192,5 @@
 	<script type="text/javascript"
 		src="/bookshopManagement/assets/js/dialog-controller.js" defer></script>
 </c:if>
-<script type="text/javascript"
-	src="/bookshopManagement/assets/js/inventory.js" defer></script>
 
 <%@ include file="/WEB-INF/views/common/footer.jsp"%>
