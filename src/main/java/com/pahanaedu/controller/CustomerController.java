@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import com.pahanaedu.model.Customer;
 import com.pahanaedu.model.enums.PersistResult;
 import com.pahanaedu.service.CustomerService;
+import com.pahanaedu.service.exception.InactiveCustomerException;
 import com.pahanaedu.util.Toast;
 import com.pahanaedu.util.Validator;
 
@@ -211,6 +212,8 @@ public class CustomerController extends HttpServlet {
 			response.getWriter().write(jsonResponse.toString());
 
 			return;
+		} catch (InactiveCustomerException e) {
+			writeJsonError(response, e.getMessage());
 		} catch (SQLException e) {
 			writeJsonError(response, "No Customer Found.");
 		}

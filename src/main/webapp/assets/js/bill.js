@@ -84,18 +84,25 @@ function searchCustomer(event, form) {
 				// enable confirm customer button
 				document.getElementById("btn-confirm-customer").disabled = false;
 				toastr.success("Customer found!");
-			} else if (data.errors) {
-				// Show validation errors
-				for (const [key, msg] of Object.entries(data.errors)) {
-					const el = document.getElementById(key);
-					if (el) el.textContent = msg;
+			} else if (!data.success) {
+				// Show validation errors from backend
+				if (data.errors) {
+					// Show validation errors
+					for (const [key, msg] of Object.entries(data.errors)) {
+						const el = document.getElementById(key);
+						if (el) el.textContent = msg;
+					}
 				}
-				document.getElementById("customerId").value = "";
-				document.getElementById("customerName").value = "";
+				if (data.message) {
+					document.getElementById("mobileError").innerText = data.message;
 
-				// disable confirm customer button
-				document.getElementById("btn-confirm-customer").disabled = true;
-				selectedCustomer = null;
+					document.getElementById("customerId").value = "";
+					document.getElementById("customerName").value = "";
+
+					// disable confirm customer button
+					document.getElementById("btn-confirm-customer").disabled = true;
+					selectedCustomer = null;
+				}
 			} else {
 				toastr.error("An error occurred while searching the customer.");
 			}
@@ -479,6 +486,6 @@ function printBill() {
 	};
 }
 
-function resetPage(){
+function resetPage() {
 	location.reload();
 }

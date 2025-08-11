@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import com.pahanaedu.dao.CustomerDao;
 import com.pahanaedu.model.Customer;
 import com.pahanaedu.model.enums.PersistResult;
+import com.pahanaedu.service.exception.InactiveCustomerException;
 
 public class CustomerService {
 	private static CustomerService instance;
@@ -30,7 +31,13 @@ public class CustomerService {
 	}
 
 	public Customer getByMobile(String mobile) throws SQLException {
-		return customerDao.getByMobile(mobile);
+		Customer customer = customerDao.getByMobile(mobile);
+		
+		if(customer != null && !customer.getIsActive()) {
+			throw new InactiveCustomerException();
+		}
+		
+		return customer;
 	}
 
 	public Customer byIdOrPhone(String searchTerm) throws SQLException {
