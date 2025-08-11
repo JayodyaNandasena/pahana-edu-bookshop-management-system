@@ -68,6 +68,24 @@ public class ItemController extends HttpServlet {
 			}
 			return;
 		}
+		
+		if ("restore".equals(action)) {
+			try {
+				int itemId = Integer.parseInt(request.getParameter("itemId"));
+
+				if (itemService.restore(itemId)) {
+					Toast.setToastCookie(response, "success", "Item restored successfully!");
+				} else {
+					Toast.setToastCookie(response, "error", "Error restoring item");
+				}
+				response.sendRedirect("inventory");
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+				Toast.setToastCookie(response, "error", "Invalid item ID");
+				response.sendRedirect("inventory");
+			}
+			return;
+		}
 
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
