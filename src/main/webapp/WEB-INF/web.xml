@@ -40,9 +40,19 @@
 		<description></description>
 		<servlet-class>com.pahanaedu.controller.EmailController</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>LogoutController</servlet-name>
+		<display-name>LogoutController</display-name>
+		<description></description>
+		<servlet-class>com.pahanaedu.controller.LogoutController</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>EmailController</servlet-name>
 		<url-pattern>/EmailController</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>LogoutController</servlet-name>
+		<url-pattern>/LogoutController</url-pattern>
 	</servlet-mapping>
 	<!-- Not Found Error -->
 	<error-page>
