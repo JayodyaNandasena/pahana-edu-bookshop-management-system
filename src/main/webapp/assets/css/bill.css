@@ -1,9 +1,9 @@
 @charset "UTF-8";
 
-svg{
-    color: var(--color-primary);
+svg {
+	color: var(--color-primary);
 }
 
-.light-icon{
-    color: var(--color-white);
+.light-icon {
+	color: var(--color-white);
 }

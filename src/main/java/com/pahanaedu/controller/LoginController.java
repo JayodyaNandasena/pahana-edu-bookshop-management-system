@@ -9,8 +9,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import com.pahanaedu.model.User;
 import com.pahanaedu.service.LoginService;
+import com.pahanaedu.util.Toast;
 import com.pahanaedu.util.Validator;
 
 @WebServlet("/login")
@@ -39,8 +42,9 @@ public class LoginController extends HttpServlet {
 			handleLogin(username, password, request, response);
 		} catch (ServletException | IOException | SQLException e) {
 			e.printStackTrace();
-			request.setAttribute("errorMessage", "An unexpected error occurred.");
-            request.getRequestDispatcher("/index.jsp").forward(request, response);
+			
+			Toast.setToastCookie(response, "error", "An unexpected error occurred");		    
+		    response.sendRedirect(request.getContextPath() + "/");
 	        return;
 		}
 		
@@ -67,14 +71,25 @@ public class LoginController extends HttpServlet {
 	        return;
 	    }
 	    
-	    if(loginService.login(username, password) != null) {
+	    User user = loginService.login(username, password);
+	    
+	    if(user != null) {
+	    	// Authentication success
+            HttpSession session = request.getSession();
+            session.setAttribute("user", user);
+            
+            Toast.setToastCookie(response, "success", "Login successful!");
+            
 	    	response.sendRedirect(request.getContextPath() + "/dashboard");
 	    	return;
 	    }
 	    
 	    errors.put("loginError", "Invalid username or password");
 	    request.setAttribute("errors", errors);
-        request.getRequestDispatcher("/index.jsp").forward(request, response);
+	    
+	    Toast.setToastCookie(response, "error", "Invalid username or password");
+	    
+	    response.sendRedirect(request.getContextPath() + "/");
         return;
 	}
 }
