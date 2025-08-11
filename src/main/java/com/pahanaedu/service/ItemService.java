@@ -39,23 +39,27 @@ public class ItemService {
 	public List<Item> byIdOrName(String searchTerm) throws SQLException {
 		return itemDao.byIdOrName(searchTerm);
 	}
-	
+
 	public Item byId(int id, int quantity) throws SQLException {
 		Item item = itemDao.byId(id);
-		
-		if(item == null) {
+
+		if (item == null) {
 			throw new ItemNotFoundException();
 		}
-		
-		if(quantity > item.getQuantityAvailable()) {
+
+		if (quantity > item.getQuantityAvailable()) {
 			throw new InsufficientStockException();
 		}
-		
+
 		return item;
 	}
 
 	public boolean delete(int itemId) {
 		return itemDao.delete(itemId);
+	}
+	
+	public boolean restore(int itemId) {
+		return itemDao.restore(itemId);
 	}
 
 	public PersistResult persist(String name, int category, double price, int quantity) {
@@ -64,5 +68,9 @@ public class ItemService {
 
 	public PersistResult update(int id, String name, int category, double price, int quantity) {
 		return itemDao.update(id, name, category, price, quantity);
+	}
+
+	public List<Item> getDeleted() throws SQLException {
+		return itemDao.getDeleted();
 	}
 }
