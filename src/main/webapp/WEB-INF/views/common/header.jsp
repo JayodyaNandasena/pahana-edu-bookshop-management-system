@@ -59,9 +59,10 @@ if (toastType != null && escapedMessage != null) {
     $(function() {
         toastr.options = {
             closeButton: true,
-            progressBar: true,
+            progressBar: false,
             positionClass: "toast-top-right",
-            timeOut: "5000"
+            timeOut: "5000",
+            newestOnTop: false,
         };
         toastr["<%= toastType %>"]("<%= escapedMessage %>");
     });
