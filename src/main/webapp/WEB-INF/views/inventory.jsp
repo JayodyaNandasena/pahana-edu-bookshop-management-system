@@ -53,12 +53,23 @@
 		<div
 			class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden p-6 my-6">
 			<!-- Category details -->
-			<div class="mb-6">
-				<div class="flex items-center mb-4">
-					<i
-						class="fa-solid fa-icons text-[var(--color-primary)] text-xl mr-3"></i>
-					<h2 class="text-2xl font-semibold text-gray-800">Explore By
-						Category</h2>
+			<div class="mb-4">
+				<div class="flex items-baseline justify-between mb-6">
+					<div class="flex items-center">
+						<i
+							class="fa-solid fa-icons text-[var(--color-primary)] text-xl mr-3"></i>
+						<h2 class="text-2xl font-semibold text-gray-800">Explore By
+							Category</h2>
+					</div>
+
+					<c:if test="${isAdmin}">
+						<form action="inventory" method="get">
+							<input type="hidden" name="q" value="deleted" />
+							<button type="submit"
+								class="pr-3 text-gray-400 hover:text-gray-600">view
+								deleted items</button>
+						</form>
+					</c:if>
 				</div>
 				<div id="categoryList" class="flex flex-wrap gap-2">
 					<c:forEach var="category" items="${categories}">
@@ -115,21 +126,37 @@
 								<div class="text-center col-span-2">${item.quantityAvailable}</div>
 
 								<c:if test="${isAdmin}">
-									<div class="flex justify-center space-x-4">
-										<div class="text-center" data-dialog-open="update-item-modal"
-											data-id="${item.id}" data-name="${item.name}"
-											data-category-id="${item.category.id}"
-											data-price="${item.unitPrice}"
-											data-quantity="${item.quantityAvailable}">
-											<i
-												class="fa-solid fa-pen-to-square text-gray-400 hover:text-green-600 cursor-pointer"></i>
-										</div>
-										<div class="text-center"
-											data-dialog-open="delete-confirmation-modal"
-											data-item-id="${item.id}" data-item-name="${item.name}">
-											<i
-												class="fa-solid fa-trash text-gray-400 hover:text-red-600 cursor-pointer"></i>
-										</div>
+									<div class="flex justify-center items-center space-x-4">
+										<c:choose>
+											<%-- Show restore button if URL says q=deleted --%>
+											<c:when test="${param.q == 'deleted'}">
+												<div class="flex items-center justify-center"
+													data-dialog-open="restore-confirmation-modal"
+													data-item-id="${item.id}" data-item-name="${item.name}">
+													<i
+														class="fa-solid fa-reply text-gray-400 hover:text-orange-600 cursor-pointer"></i>
+												</div>
+											</c:when>
+
+											<%-- Otherwise show edit/delete buttons --%>
+											<c:otherwise>
+												<div class="flex items-center justify-center"
+													data-dialog-open="update-item-modal" data-id="${item.id}"
+													data-name="${item.name}"
+													data-category-id="${item.category.id}"
+													data-price="${item.unitPrice}"
+													data-quantity="${item.quantityAvailable}">
+													<i
+														class="fa-solid fa-pen-to-square text-gray-400 hover:text-green-600 cursor-pointer"></i>
+												</div>
+												<div class="flex items-center justify-center"
+													data-dialog-open="delete-confirmation-modal"
+													data-item-id="${item.id}" data-item-name="${item.name}">
+													<i
+														class="fa-solid fa-trash text-gray-400 hover:text-red-600 cursor-pointer"></i>
+												</div>
+											</c:otherwise>
+										</c:choose>
 									</div>
 								</c:if>
 							</div>
@@ -185,6 +212,8 @@
 		<%@ include file="/WEB-INF/views/common/update-item-dialog.jsp"%>
 		<!-- Delete item confirmation dialog -->
 		<%@ include file="/WEB-INF/views/common/confirm-delete-dialog.jsp"%>
+		<!-- Restore item confirmation dialog -->
+		<%@ include file="/WEB-INF/views/common/confirm-restore-dialog.jsp"%>
 	</c:if>
 </div>
 
@@ -192,7 +221,5 @@
 	<script type="text/javascript"
 		src="/bookshopManagement/assets/js/dialog-controller.js" defer></script>
 </c:if>
-<script type="text/javascript"
-	src="/bookshopManagement/assets/js/inventory.js" defer></script>
 
 <%@ include file="/WEB-INF/views/common/footer.jsp"%>

@@ -109,44 +109,48 @@ public class AppController extends HttpServlet {
 			request.setAttribute("error", "Unable to search customer.");
 		}
 	}
-	
+
 	private void handleInventoryPage(HttpServletRequest request) {
 		try {
 			List<Category> categories = CategoryService.getInstance().all();
 			List<Item> items;
-			
+
 			String categoryIdParam = request.getParameter("category");
-			String searchParam = request.getParameter("q");			
+			String searchParam = request.getParameter("q");
 
 			Integer selectedCategoryId = null;
 
 			if (categoryIdParam != null && !categoryIdParam.isEmpty()) {
-			    try {
-			        int categoryId = Integer.parseInt(categoryIdParam);
+				try {
+					int categoryId = Integer.parseInt(categoryIdParam);
 
-			        // Check if this ID exists in the category list
-			        boolean categoryExists = categories.stream()
-			            .anyMatch(c -> c.getId() == categoryId);
+					// Check if this ID exists in the category list
+					boolean categoryExists = categories.stream().anyMatch(c -> c.getId() == categoryId);
 
-			        if (categoryExists) {
-			            selectedCategoryId = categoryId;
-			            items = ItemService.getInstance().byCategory(categoryId);
-			        } else {
-			            // Invalid category
-			            items = ItemService.getInstance().all();
-			        }
+					if (categoryExists) {
+						selectedCategoryId = categoryId;
+						items = ItemService.getInstance().byCategory(categoryId);
+					} else {
+						// Invalid category
+						items = ItemService.getInstance().all();
+					}
 
-			    } catch (NumberFormatException e) {
-			        // Invalid input
-			        items = ItemService.getInstance().all();
-			    }
-			} else if (searchParam != null && !searchParam.isEmpty()){
-				items = ItemService.getInstance().byIdOrName(searchParam);
+				} catch (NumberFormatException e) {
+					// Invalid input
+					items = ItemService.getInstance().all();
+				}
+			} else if (searchParam != null && !searchParam.isEmpty()) {
+				if ("deleted".equals(searchParam)) {
+					items = ItemService.getInstance().getDeleted();
+				} else {
+					items = ItemService.getInstance().byIdOrName(searchParam);
+				}
+
 				selectedCategoryId = -1;
 			} else {
-			    // No category selected
-			    items = ItemService.getInstance().all();
-			}			
+				// No category selected
+				items = ItemService.getInstance().all();
+			}
 
 			request.setAttribute("items", items);
 			request.setAttribute("categories", categories);

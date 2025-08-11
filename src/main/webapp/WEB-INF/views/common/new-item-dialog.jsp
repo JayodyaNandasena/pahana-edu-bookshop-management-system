@@ -106,11 +106,6 @@
       event.preventDefault(); // Stop the default form submit
 
       const formData = new FormData(form);
-      
-      for (const [key, value] of formData.entries()) {
-    	  console.log(key, value);
-    	}
-
       const data = new URLSearchParams(new FormData(form));
 
       fetch(form.action, {
@@ -122,7 +117,8 @@
       })
       .then(response => {
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+        	toastr.error("Network response was not ok");
+        	return;
         }
         return response.json();
       })
@@ -135,9 +131,10 @@
 		  });
 		
 		  if (data.success) {
-		    alert(data.message || "Item created successfully!");
+			toastr.success(data.message || "Item created successfully!");
 		    document.getElementById("new-item-modal").close();
 		    form.reset();
+  		  	window.location.reload();
 		  } else if (data.errors) {
 		    // Show validation errors
 		    for (const [key, msg] of Object.entries(data.errors)) {
@@ -152,12 +149,12 @@
 		    }	    
 		 	 
 		  } else {
-		    alert("An error occurred while creating the item.");
+			  toastr.error("An error occurred while creating the item.");
 		  }
 		})
       .catch(error => {
         // Handle error
-        alert("There was a problem creating the item: " + error.message);
+        toastr.error("There was a problem creating the item: " + error.message);
       });
     });
 

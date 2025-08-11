@@ -10,9 +10,13 @@
 
 <div class="ml-64 p-8">
 	<div class="max-w-7xl mx-auto">
-		<!-- Header -->
+		<!-- Header -->		
 		<div class="flex items-center justify-between mb-6">
 			<h1 class="text-3xl font-bold mb-2">Create New Bill</h1>
+			<button id="btn-new-bill"
+				class="btn-primary px-6 py-2 rounded-xl font-medium transition-all flex items-center justify-center">
+				<i class="fas fa-undo mr-1"></i> <span>New</span>
+			</button>
 		</div>
 
 		<div class="grid grid-cols-1 md:grid-cols-7 gap-4">

@@ -18,6 +18,7 @@ import com.pahanaedu.model.enums.PersistResult;
 import com.pahanaedu.service.ItemService;
 import com.pahanaedu.service.exception.InsufficientStockException;
 import com.pahanaedu.service.exception.ItemNotFoundException;
+import com.pahanaedu.util.Toast;
 import com.pahanaedu.util.Validator;
 
 @WebServlet("/item")
@@ -53,16 +54,35 @@ public class ItemController extends HttpServlet {
 		if ("delete".equals(action)) {
 			try {
 				int itemId = Integer.parseInt(request.getParameter("itemId"));
-				boolean success = itemService.delete(itemId);
 
-				if (success) {
-					response.sendRedirect("inventory?deleted=true");
+				if (itemService.delete(itemId)) {
+					Toast.setToastCookie(response, "success", "Item deleted successfully!");
 				} else {
-					response.sendRedirect("inventory?deleted=false");
+					Toast.setToastCookie(response, "error", "Error deleting item");
 				}
+				response.sendRedirect("inventory");
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
-				response.sendRedirect("inventory?error=invalid_id");
+				Toast.setToastCookie(response, "error", "Invalid item ID");
+				response.sendRedirect("inventory");
+			}
+			return;
+		}
+		
+		if ("restore".equals(action)) {
+			try {
+				int itemId = Integer.parseInt(request.getParameter("itemId"));
+
+				if (itemService.restore(itemId)) {
+					Toast.setToastCookie(response, "success", "Item restored successfully!");
+				} else {
+					Toast.setToastCookie(response, "error", "Error restoring item");
+				}
+				response.sendRedirect("inventory");
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+				Toast.setToastCookie(response, "error", "Invalid item ID");
+				response.sendRedirect("inventory");
 			}
 			return;
 		}
@@ -195,53 +215,54 @@ public class ItemController extends HttpServlet {
 		}
 	}
 
-	private void handleSearchById(int id, int quantity, HttpServletRequest request, HttpServletResponse response) throws IOException {
-	    response.setContentType("application/json");
-	    response.setCharacterEncoding("UTF-8");
+	private void handleSearchById(int id, int quantity, HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
 
-	    try {
-	        // Validate input
-	        HashMap<String, String> errors = new HashMap<>();
+		try {
+			// Validate input
+			HashMap<String, String> errors = new HashMap<>();
 
-	        if (!Validator.isValidDigit(id, 1, Integer.MAX_VALUE)) {
-	            errors.put("idError", "Item ID must be a positive integer.");
-	        }
+			if (!Validator.isValidDigit(id, 1, Integer.MAX_VALUE)) {
+				errors.put("idError", "Item ID must be a positive integer.");
+			}
 
-	        if (!Validator.isValidDigit(quantity, 1, 10000)) {
-	            errors.put("quantityError", "Quantity must be between 1 and 10000.");
-	        }
+			if (!Validator.isValidDigit(quantity, 1, 10000)) {
+				errors.put("quantityError", "Quantity must be between 1 and 10000.");
+			}
 
-	        if (!errors.isEmpty()) {
-	            writeJsonErrors(response, errors);
-	            return;
-	        }
+			if (!errors.isEmpty()) {
+				writeJsonErrors(response, errors);
+				return;
+			}
 
-	        // Item search with quantity check
-	        Item item = itemService.byId(id, quantity);
+			// Item search with quantity check
+			Item item = itemService.byId(id, quantity);
 
-	        JSONObject jsonResponse = new JSONObject();
-	        JSONObject itemJson = new JSONObject();
+			JSONObject jsonResponse = new JSONObject();
+			JSONObject itemJson = new JSONObject();
 
-	        itemJson.put("id", item.getId());
-	        itemJson.put("name", item.getName());
-	        itemJson.put("quantity", quantity);
-	        itemJson.put("unitPrice", item.getUnitPrice());
-	        itemJson.put("total", quantity * item.getUnitPrice());
+			itemJson.put("id", item.getId());
+			itemJson.put("name", item.getName());
+			itemJson.put("quantity", quantity);
+			itemJson.put("unitPrice", item.getUnitPrice());
+			itemJson.put("total", quantity * item.getUnitPrice());
 
-	        jsonResponse.put("success", true);
-	        jsonResponse.put("item", itemJson);
+			jsonResponse.put("success", true);
+			jsonResponse.put("item", itemJson);
 
-	        response.getWriter().write(jsonResponse.toString());
+			response.getWriter().write(jsonResponse.toString());
 
-	    } catch (ItemNotFoundException e) {
-	        writeJsonError(response, e.getMessage());
-	    } catch (InsufficientStockException e) {
-	        writeJsonError(response, e.getMessage());
-	    } catch (SQLException e) {
-	        writeJsonError(response, "Database error occurred while fetching item.");
-	    } catch (Exception e) {
-	        writeJsonError(response, "Unexpected error: " + e.getMessage());
-	    }
+		} catch (ItemNotFoundException e) {
+			writeJsonError(response, e.getMessage());
+		} catch (InsufficientStockException e) {
+			writeJsonError(response, e.getMessage());
+		} catch (SQLException e) {
+			writeJsonError(response, "Database error occurred while fetching item.");
+		} catch (Exception e) {
+			writeJsonError(response, "Unexpected error: " + e.getMessage());
+		}
 	}
 
 	private HashMap<String, String> validateInputs(String name, int category, double price, int quantity) {
