@@ -62,6 +62,7 @@ function searchCustomer(event, form) {
 		.then(response => {
 			if (!response.ok) {
 				toastr.error("Network response was not ok");
+				return;
 			}
 			return response.json();
 		})
@@ -143,6 +144,7 @@ function addItem(event, form) {
 		.then(response => {
 			if (!response.ok) {
 				toastr.error("Network response was not ok");
+				return;
 			}
 			return response.json();
 		})
@@ -350,6 +352,7 @@ function createBill() {
 		.then(response => {
 			if (!response.ok) {
 				toastr.error("Network response was not ok");
+				return;
 			}
 			return response.json();
 		})
