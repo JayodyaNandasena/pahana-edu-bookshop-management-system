@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import com.pahanaedu.model.Customer;
 import com.pahanaedu.model.enums.PersistResult;
 import com.pahanaedu.service.CustomerService;
+import com.pahanaedu.util.Toast;
 import com.pahanaedu.util.Validator;
 
 @WebServlet("/customer")
@@ -87,7 +88,11 @@ public class CustomerController extends HttpServlet {
 	private void handleDeactivate(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String id = request.getParameter("id");
 
-		customerService.deactivate(id);
+		if (customerService.deactivate(id)) {
+			Toast.setToastCookie(response, "success", "Customer deactivated successfully!");
+		} else {
+			Toast.setToastCookie(response, "error", "Error deactivating the customer");
+		}
 
 		response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
 
@@ -97,7 +102,11 @@ public class CustomerController extends HttpServlet {
 	private void handleActivate(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String id = request.getParameter("id");
 
-		customerService.activate(id);
+		if (customerService.activate(id)) {
+			Toast.setToastCookie(response, "success", "Customer activated successfully!");
+		} else {
+			Toast.setToastCookie(response, "error", "Error activating the customer");
+		}
 
 		response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
 
@@ -137,6 +146,7 @@ public class CustomerController extends HttpServlet {
 
 		switch (result) {
 		case SUCCESS:
+			Toast.setToastCookie(response, "success", "Customer details updated successfully!");
 			response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
 			return;
 		case EMAIL_EXISTS:
@@ -155,6 +165,7 @@ public class CustomerController extends HttpServlet {
 		// On update error, set errors and form data in session and redirect
 		session.setAttribute("errors", errors);
 		session.setAttribute("customer", customerFormData);
+		Toast.setToastCookie(response, "error", "Error updating customer");
 		response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
 	}
 
@@ -180,23 +191,26 @@ public class CustomerController extends HttpServlet {
 			Customer customer = customerService.getByMobile(mobile);
 
 			if (customer == null) {
-				errors.put("mobileError","No Customer Found.");
+				errors.put("mobileError", "No Customer Found.");
 				writeJsonErrors(response, errors);
-			} else {
-				JSONObject jsonResponse = new JSONObject();
-				JSONObject customerJson = new JSONObject();
-
-				customerJson.put("id", customer.getId());
-				customerJson.put("firstName", customer.getFirstName());
-				customerJson.put("lastName", customer.getLastName());
-				customerJson.put("email", customer.getEmail());
-
-				jsonResponse.put("success", true);
-				jsonResponse.put("customer", customerJson);
-
-				response.setContentType("application/json");
-				response.getWriter().write(jsonResponse.toString());
+				return;
 			}
+
+			JSONObject jsonResponse = new JSONObject();
+			JSONObject customerJson = new JSONObject();
+
+			customerJson.put("id", customer.getId());
+			customerJson.put("firstName", customer.getFirstName());
+			customerJson.put("lastName", customer.getLastName());
+			customerJson.put("email", customer.getEmail());
+
+			jsonResponse.put("success", true);
+			jsonResponse.put("customer", customerJson);
+
+			response.setContentType("application/json");
+			response.getWriter().write(jsonResponse.toString());
+
+			return;
 		} catch (SQLException e) {
 			writeJsonError(response, "No Customer Found.");
 		}

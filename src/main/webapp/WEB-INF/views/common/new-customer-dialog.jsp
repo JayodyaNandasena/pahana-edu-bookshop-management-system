@@ -113,10 +113,6 @@
       event.preventDefault(); // Stop the default form submit
 
       const formData = new FormData(form);
-      
-      for (const [key, value] of formData.entries()) {
-    	  console.log(key, value);
-    	}
 
       const data = new URLSearchParams(new FormData(form));
 
@@ -129,7 +125,8 @@
       })
       .then(response => {
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+        	toastr.error("Network response was not ok");
+        	return;
         }
         return response.json();
       })
@@ -142,7 +139,7 @@
 		  });
 		
 		  if (data.success) {
-		    alert(data.message || "Customer created successfully!");
+		    toastr.success(data.message || "Customer created successfully!");
 		    document.getElementById("new-customer-modal").close();
 		    form.reset();
 		  } else if (data.errors) {
@@ -152,7 +149,7 @@
 		      if (el) el.textContent = msg;
 		    }
 		  } else {
-		    alert("An error occurred while creating the customer.");
+			  toastr.error("An error occurred while creating the customer.");
 		  }
 		})
       .catch(error => {

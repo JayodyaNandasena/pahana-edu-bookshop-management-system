@@ -138,3 +138,8 @@ nav .sidebar-active {
 	background-color: var(--color-secondary);
 	color: black;
 }
+
+/* Make all toasts fully opaque */
+#toast-container>.toast {
+	opacity: 1 !important; /* Override default 0.8 */
+}
