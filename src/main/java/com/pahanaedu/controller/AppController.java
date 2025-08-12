@@ -22,7 +22,7 @@ import com.pahanaedu.model.Item;
 import com.pahanaedu.service.CategoryService;
 import com.pahanaedu.service.ItemService;
 
-@WebServlet(urlPatterns = { "/", "/bill", "/customers", "/dashboard", "/inventory" })
+@WebServlet(urlPatterns = { "/", "/bill", "/customers", "/dashboard", "/inventory", "/user-guide" })
 public class AppController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -61,6 +61,10 @@ public class AppController extends HttpServlet {
 			handleInventoryPage(request);
 			request.setAttribute("activePage", "inventory");
 			targetPage = "/WEB-INF/views/inventory.jsp";
+			break;
+		case "/user-guide":
+			targetPage = "/WEB-INF/views/user-guide.jsp";
+			request.setAttribute("activePage", "user-guide");
 			break;
 		default:
 			targetPage = "/WEB-INF/views/404.jsp";
