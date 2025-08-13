@@ -6,23 +6,29 @@
 
 :root {
 	/* Color variables */
-	--color-primary: #29539B;
-	--color-primary-light: #3D6BB3;
+	--color-primary: #1E40AF;
+	--color-primary-light: #3B82F6;
 	--color-primary-hover: #2563EB;
-	--color-secondary: #7EB6FF;
-	--color-text: #252525;
-	--color-disabled: #D9D9D9;
-	--color-white: #F2F4F8;
-	--color-grey: #444547FF;
-	--color-green: #33691E;
-	--color-green-light: #558B2F;
-	--color-success: #1DB67B;
-	--color-warning: #FFAE42;
-	--color-danger: #E34234;
-	--color-background: #F8F6F1;
+	--color-secondary: #60A5FA;
+	--color-text: #1E1E1E;
+	--color-disabled: #E5E7EB;
+	--color-white: #FFFFFF;
+	--color-grey: #4B5563;
+	--color-green: #2E7D32;
+	--color-green-light: #4CAF50;
+	--color-success: #10B981;
+	--color-warning: #FBBF24;
+	--color-danger: #DC2626;
+	--color-background: #F9FAFB;
 	/* Font variables */
 	--font-serif: 'Merriweather', serif;
-	--font-sans: 'Merriweather Sans', sans-serif;
+	--font-sans: 'Inter', sans-serif;
+}
+
+/* Smooth scrolling */
+html {
+	scroll-behavior: smooth;
+	scroll-padding-top: 20px;
 }
 
 body {
