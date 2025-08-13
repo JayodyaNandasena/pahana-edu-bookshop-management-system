@@ -1,0 +1,19 @@
+@charset "UTF-8";
+
+.bg-books {
+	background-size: 400px 400px;
+	background-repeat: repeat;
+}
+
+.section-card {
+	backdrop-filter: blur(10px);
+	background: rgba(255, 255, 255, 0.95);
+}
+
+.step-number {
+	background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.feature-icon {
+	background: linear-gradient(135deg, #e0f2fe, #b3e5fc);
+}
