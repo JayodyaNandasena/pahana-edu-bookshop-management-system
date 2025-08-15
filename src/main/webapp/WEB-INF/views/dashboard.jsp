@@ -1,11 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8" isELIgnored="false" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <link rel="stylesheet" type="text/css"
 	href="/bookshopManagement/assets/css/dashboard.css">
 
-<%@ include file="/pages/common/header.jsp"%>
-<%@ include file="/pages/common/sidebar.jsp"%>
+<%@ include file="/WEB-INF/views/common/header.jsp"%>
+<%@ include file="/WEB-INF/views/common/sidebar.jsp"%>
 
 <div class="ml-64 flex-1 p-8">
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -16,11 +17,10 @@
 				Edu</h1>
 			<div
 				class="card main-card mt-4 p-5 rounded-xl bg-white shadow-sm border border-gray-200">
-				<h2 class="text-2xl font-semibold text-gray-800 mb-2">Hello
-					John!</h2>
+				<h2 class="text-2xl font-semibold text-gray-800 mb-2">Hello ${sessionScope.user.name}</h2>
 				<p class="text-gray-600 mb-6">Start with the User Guide or
 					create a bill below.</p>
-				<a href="#"
+				<a href="<c:url value='/bill' />"
 					class="btn-primary px-8 py-3 rounded-lg font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700">
 					Create Bill </a>
 			</div>
@@ -90,4 +90,4 @@
 	</div>
 </div>
 
-<%@ include file="/pages/common/footer.jsp"%>
+<%@ include file="/WEB-INF/views/common/footer.jsp"%>
