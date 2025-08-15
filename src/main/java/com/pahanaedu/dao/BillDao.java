@@ -10,6 +10,8 @@ import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.pahanaedu.model.Bill;
 import com.pahanaedu.util.DbConnectionFactory;
@@ -109,5 +111,29 @@ public class BillDao {
 				return 0.0; // no rows
 			}
 		}
+	}
+
+	public List<Double> getMonthlyRevenues() throws SQLException {
+		String sql = "SELECT MONTH(bill_date) AS month, SUM(total) AS revenue " + "FROM bill "
+				+ "WHERE YEAR(bill_date) = YEAR(CURDATE()) " + "GROUP BY month " + "ORDER BY month";
+
+		// Initialize list with 12 zeros (Jan=0, Feb=1, ..., Dec=11)
+		List<Double> monthlyRevenues = new ArrayList<>();
+		for (int i = 0; i < 12; i++) {
+			monthlyRevenues.add(0.0);
+		}
+
+		try (Connection conn = DbConnectionFactory.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql)) {
+
+			while (rs.next()) {
+				int month = rs.getInt("month"); // 1 = Jan, 2 = Feb, ...
+				double revenue = rs.getDouble("revenue");
+				monthlyRevenues.set(month - 1, revenue); // store at index 0-11
+			}
+		}
+
+		return monthlyRevenues;
 	}
 }

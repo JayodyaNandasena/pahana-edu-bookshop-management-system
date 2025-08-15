@@ -123,4 +123,8 @@ public class BillService {
 	public Double getAverageBillValue() throws SQLException {
 		return billDao.getAverage();
 	}
+
+	public List<Double> getMonthlyRevenues() throws SQLException {
+		return billDao.getMonthlyRevenues();
+	}
 }

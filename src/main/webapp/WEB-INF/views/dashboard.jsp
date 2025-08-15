@@ -198,40 +198,14 @@
 	<div class="mb-8">
 		<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
 			<div class="flex items-center justify-between mb-6">
-				<h3 class="text-lg font-semibold text-gray-800">Sales Trends</h3>
-				<div class="flex space-x-2">
-					<button
-						class="px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded-lg font-medium">7
-						Days</button>
-					<button
-						class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">30
-						Days</button>
-					<button
-						class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">3
-						Months</button>
-				</div>
+				<h3 class="text-lg font-semibold text-gray-800">Sales Trends
+					(Monthly)</h3>
+				<span class="text-sm text-gray-500 font-medium border-2 px-3 py-1 rounded-lg">This Year</span>
 			</div>
 
 			<!-- Chart Container -->
 			<div class="relative h-64">
 				<canvas id="salesChart" class="w-full h-full"></canvas>
-			</div>
-
-			<!-- Chart Legend/Summary -->
-			<div
-				class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-4 border-t border-gray-200">
-				<div class="text-center">
-					<p class="text-2xl font-bold text-blue-600">${weeklyTotal != null ? weeklyTotal : '0'}</p>
-					<p class="text-sm text-gray-600">This Week</p>
-				</div>
-				<div class="text-center">
-					<p class="text-2xl font-bold text-green-600">${dailyAverage != null ? dailyAverage : '0'}</p>
-					<p class="text-sm text-gray-600">Daily Average</p>
-				</div>
-				<div class="text-center">
-					<p class="text-2xl font-bold text-purple-600">${bestDay != null ? bestDay : 'N/A'}</p>
-					<p class="text-sm text-gray-600">Best Day</p>
-				</div>
 			</div>
 		</div>
 	</div>
@@ -242,15 +216,26 @@
 	src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 
 <script>
+// Month labels
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+// Convert server-side list to JavaScript array
+const monthlyRevenue = [
+    <c:forEach var="rev" items="${monthlyRevenues}" varStatus="status">
+        ${rev}<c:if test="${!status.last}">, </c:if>
+    </c:forEach>
+];
+
 // Sales Chart Configuration
 const ctx = document.getElementById('salesChart').getContext('2d');
 const salesChart = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        labels: months,
         datasets: [{
-            label: 'Daily Sales ($)',
-            data: [${salesData != null ? salesData : '120, 190, 300, 500, 200, 300, 450'}],
+            label: 'Revenue (LKR)',
+            data: monthlyRevenue,
             borderColor: '#3B82F6',
             backgroundColor: 'rgba(59, 130, 246, 0.1)',
             borderWidth: 3,
@@ -266,79 +251,17 @@ const salesChart = new Chart(ctx, {
     options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
+        plugins: { legend: { display: false } },
         scales: {
             y: {
                 beginAtZero: true,
-                grid: {
-                    color: '#F3F4F6'
-                },
-                ticks: {
-                    callback: function(value) {
-                        return ' + value;
-                    }
-                }
+                grid: { color: '#F3F4F6' },
+                ticks: { callback: value => `${value}` }
             },
-            x: {
-                grid: {
-                    display: false
-                }
-            }
-        },
-        elements: {
-            point: {
-                hoverBackgroundColor: '#1D4ED8'
-            }
+            x: { grid: { display: false } }
         }
     }
 });
-
-// Time period button functionality
-document.querySelectorAll('.bg-blue-100, .hover\\:bg-gray-100').forEach(button => {
-    button.addEventListener('click', function() {
-        // Remove active class from all buttons
-        document.querySelectorAll('.bg-blue-100, .hover\\:bg-gray-100').forEach(btn => {
-            btn.classList.remove('bg-blue-100', 'text-blue-600');
-            btn.classList.add('text-gray-600', 'hover:bg-gray-100');
-        });
-        
-        // Add active class to clicked button
-        this.classList.remove('text-gray-600', 'hover:bg-gray-100');
-        this.classList.add('bg-blue-100', 'text-blue-600');
-        
-        // Update chart data based on selection
-        const period = this.textContent;
-        updateChartData(period);
-    });
-});
-
-function updateChartData(period) {
-    // You can implement AJAX calls here to fetch data for different periods
-    let newData, newLabels;
-    
-    switch(period) {
-        case '7 Days':
-            newLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            newData = [${salesData != null ? salesData : '120, 190, 300, 500, 200, 300, 450'}];
-            break;
-        case '30 Days':
-            newLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-            newData = [1200, 1500, 1800, 1600];
-            break;
-        case '3 Months':
-            newLabels = ['Month 1', 'Month 2', 'Month 3'];
-            newData = [5000, 6200, 5800];
-            break;
-    }
-    
-    salesChart.data.labels = newLabels;
-    salesChart.data.datasets[0].data = newData;
-    salesChart.update();
-}
 </script>
 
 <%@ include file="/WEB-INF/views/common/footer.jsp"%>

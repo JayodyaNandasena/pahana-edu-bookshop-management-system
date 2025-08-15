@@ -176,6 +176,7 @@ public class AppController extends HttpServlet {
 		Double averagePerCustomer = 0.0;
 		List<Item> lowStockItems = new ArrayList<Item>();
 		List<Item> outOfStockItems = new ArrayList<Item>();
+		List<Double> monthlyRevenues = new ArrayList<Double>();
 		
 		try {
 			totalBills = BillService.getInstance().getTotalRevenue();
@@ -190,6 +191,7 @@ public class AppController extends HttpServlet {
 			// get out of stock items
 			outOfStockItems = ItemService.getInstance().getOutOfStockItems();
 			// get sales details
+			monthlyRevenues = BillService.getInstance().getMonthlyRevenues();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -201,5 +203,6 @@ public class AppController extends HttpServlet {
 		request.setAttribute("averagePerCustomer", averagePerCustomer);
 		request.setAttribute("lowStockItems", lowStockItems);
 		request.setAttribute("outOfStockItems", outOfStockItems);
+		request.setAttribute("monthlyRevenues", monthlyRevenues);
 	}
 }
