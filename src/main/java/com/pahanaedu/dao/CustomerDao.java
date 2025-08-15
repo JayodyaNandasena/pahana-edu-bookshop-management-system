@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -192,16 +193,32 @@ public class CustomerDao {
 	public void increaseUnitsConsumed(int id, int unitsConsumed, Connection conn) throws SQLException {
 		String sql = "UPDATE customer SET units_consumed = units_consumed + ? WHERE id = ?";
 
-	    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-	        stmt.setInt(1, unitsConsumed);
-	        stmt.setInt(2, id);
+		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setInt(1, unitsConsumed);
+			stmt.setInt(2, id);
 
-	        int rowsAffected = stmt.executeUpdate();
+			int rowsAffected = stmt.executeUpdate();
 
-	        if (rowsAffected == 0) {
-	            throw new SQLException("Updating units consumed failed: no customer found with id " + id);
-	        }
-	    }
+			if (rowsAffected == 0) {
+				throw new SQLException("Updating units consumed failed: no customer found with id " + id);
+			}
+		}
+	}
+
+	public int activeCount() throws SQLException {
+		String sql = "SELECT COUNT(*) AS active_count FROM customer WHERE is_active = 1";
+
+		try (Connection conn = DbConnectionFactory.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql)) {
+
+			if (rs.next()) {
+				// Get the value as double
+				return rs.getInt("active_count");
+			} else {
+				return 0;
+			}
+		}
 	}
 
 	// Helper method to detect unique constraint violations

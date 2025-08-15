@@ -114,4 +114,13 @@ public class BillService {
             throw e;  // rethrow exception after rollback
 		}
 	}
+
+	public Double getTotalRevenue() throws SQLException {
+		// TODO Auto-generated method stub
+		return billDao.getTotal();
+	}
+
+	public Double getAverageBillValue() throws SQLException {
+		return billDao.getAverage();
+	}
 }

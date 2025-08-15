@@ -19,6 +19,7 @@ import com.pahanaedu.util.Validator;
 
 import com.pahanaedu.model.Category;
 import com.pahanaedu.model.Item;
+import com.pahanaedu.service.BillService;
 import com.pahanaedu.service.CategoryService;
 import com.pahanaedu.service.ItemService;
 
@@ -54,6 +55,7 @@ public class AppController extends HttpServlet {
 			request.setAttribute("activePage", "customers");
 			break;
 		case "/dashboard":
+			handleDashboard(request);
 			targetPage = "/WEB-INF/views/dashboard.jsp";
 			request.setAttribute("activePage", "dashboard");
 			break;
@@ -163,5 +165,33 @@ public class AppController extends HttpServlet {
 			e.printStackTrace();
 			request.setAttribute("error", "Unable to load items.");
 		}
+	}
+
+	private void handleDashboard(HttpServletRequest request) {
+		// get total revenue
+		Double totalBills = 0.0;
+		Double averageBills = 0.0;
+		int activeCustomerCount = 0;
+		Double averagePerCustomer = 0.0;
+		try {
+			totalBills = BillService.getInstance().getTotalRevenue();
+			// get average order value
+			averageBills = BillService.getInstance().getAverageBillValue();
+			// get number of active customers
+			activeCustomerCount = CustomerService.getInstance().getActiveCustomerCount();
+			// get average revenue per customer
+			averagePerCustomer = Math.round((totalBills / activeCustomerCount) * 100.0) / 100.0;
+			// get low stock items
+			// get out of stock items
+			// get sales details
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		request.setAttribute("totalBills", totalBills);
+		request.setAttribute("averageBills", averageBills);
+		request.setAttribute("activeCustomerCount", activeCustomerCount);
+		request.setAttribute("averagePerCustomer", averagePerCustomer);
 	}
 }

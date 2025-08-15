@@ -12,6 +12,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 import com.pahanaedu.model.Bill;
+import com.pahanaedu.util.DbConnectionFactory;
 
 public class BillDao {
 
@@ -75,6 +76,38 @@ public class BillDao {
 			}
 
 			return billCode;
+		}
+	}
+
+	public Double getTotal() throws SQLException {
+		String sql = "SELECT get_total_bill() AS total";
+
+		try (Connection conn = DbConnectionFactory.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql)) {
+
+			if (rs.next()) {
+				// Get the value as double
+				return rs.getDouble("total");
+			} else {
+				return 0.0; // no rows
+			}
+		}
+	}
+
+	public Double getAverage() throws SQLException {
+		String sql = "SELECT get_average_bill() AS average";
+
+		try (Connection conn = DbConnectionFactory.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql)) {
+
+			if (rs.next()) {
+				// Get the value as double
+				return rs.getDouble("average");
+			} else {
+				return 0.0; // no rows
+			}
 		}
 	}
 }
