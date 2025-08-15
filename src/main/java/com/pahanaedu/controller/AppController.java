@@ -2,6 +2,7 @@ package com.pahanaedu.controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -173,6 +174,9 @@ public class AppController extends HttpServlet {
 		Double averageBills = 0.0;
 		int activeCustomerCount = 0;
 		Double averagePerCustomer = 0.0;
+		List<Item> lowStockItems = new ArrayList<Item>();
+		List<Item> outOfStockItems = new ArrayList<Item>();
+		
 		try {
 			totalBills = BillService.getInstance().getTotalRevenue();
 			// get average order value
@@ -182,7 +186,9 @@ public class AppController extends HttpServlet {
 			// get average revenue per customer
 			averagePerCustomer = Math.round((totalBills / activeCustomerCount) * 100.0) / 100.0;
 			// get low stock items
+			lowStockItems = ItemService.getInstance().getLowStockItems();
 			// get out of stock items
+			outOfStockItems = ItemService.getInstance().getOutOfStockItems();
 			// get sales details
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -193,5 +199,7 @@ public class AppController extends HttpServlet {
 		request.setAttribute("averageBills", averageBills);
 		request.setAttribute("activeCustomerCount", activeCustomerCount);
 		request.setAttribute("averagePerCustomer", averagePerCustomer);
+		request.setAttribute("lowStockItems", lowStockItems);
+		request.setAttribute("outOfStockItems", outOfStockItems);
 	}
 }

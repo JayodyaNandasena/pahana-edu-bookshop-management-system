@@ -73,4 +73,12 @@ public class ItemService {
 	public List<Item> getDeleted() throws SQLException {
 		return itemDao.getDeleted();
 	}
+
+	public List<Item> getLowStockItems() throws SQLException {
+		return itemDao.getLowStockItems();
+	}
+	
+	public List<Item> getOutOfStockItems() throws SQLException {
+		return itemDao.getOutOfStockItems();
+	}
 }
