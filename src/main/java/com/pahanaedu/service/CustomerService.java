@@ -56,4 +56,8 @@ public class CustomerService {
 			String address) {
 		return customerDao.update(id, firstName, lastName, phone, email, address);
 	}
+
+	public int getActiveCustomerCount() throws SQLException {
+		return customerDao.activeCount();
+	}
 }

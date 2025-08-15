@@ -2,6 +2,7 @@ package com.pahanaedu.controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import com.pahanaedu.util.Validator;
 
 import com.pahanaedu.model.Category;
 import com.pahanaedu.model.Item;
+import com.pahanaedu.service.BillService;
 import com.pahanaedu.service.CategoryService;
 import com.pahanaedu.service.ItemService;
 
@@ -54,6 +56,7 @@ public class AppController extends HttpServlet {
 			request.setAttribute("activePage", "customers");
 			break;
 		case "/dashboard":
+			handleDashboard(request);
 			targetPage = "/WEB-INF/views/dashboard.jsp";
 			request.setAttribute("activePage", "dashboard");
 			break;
@@ -163,5 +166,43 @@ public class AppController extends HttpServlet {
 			e.printStackTrace();
 			request.setAttribute("error", "Unable to load items.");
 		}
+	}
+
+	private void handleDashboard(HttpServletRequest request) {
+		// get total revenue
+		Double totalBills = 0.0;
+		Double averageBills = 0.0;
+		int activeCustomerCount = 0;
+		Double averagePerCustomer = 0.0;
+		List<Item> lowStockItems = new ArrayList<Item>();
+		List<Item> outOfStockItems = new ArrayList<Item>();
+		List<Double> monthlyRevenues = new ArrayList<Double>();
+		
+		try {
+			totalBills = BillService.getInstance().getTotalRevenue();
+			// get average order value
+			averageBills = BillService.getInstance().getAverageBillValue();
+			// get number of active customers
+			activeCustomerCount = CustomerService.getInstance().getActiveCustomerCount();
+			// get average revenue per customer
+			averagePerCustomer = Math.round((totalBills / activeCustomerCount) * 100.0) / 100.0;
+			// get low stock items
+			lowStockItems = ItemService.getInstance().getLowStockItems();
+			// get out of stock items
+			outOfStockItems = ItemService.getInstance().getOutOfStockItems();
+			// get sales details
+			monthlyRevenues = BillService.getInstance().getMonthlyRevenues();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		request.setAttribute("totalBills", totalBills);
+		request.setAttribute("averageBills", averageBills);
+		request.setAttribute("activeCustomerCount", activeCustomerCount);
+		request.setAttribute("averagePerCustomer", averagePerCustomer);
+		request.setAttribute("lowStockItems", lowStockItems);
+		request.setAttribute("outOfStockItems", outOfStockItems);
+		request.setAttribute("monthlyRevenues", monthlyRevenues);
 	}
 }

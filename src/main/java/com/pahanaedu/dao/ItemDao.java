@@ -242,6 +242,53 @@ public class ItemDao {
 		}
 	}
 
+	public List<Item> getLowStockItems() throws SQLException {
+		List<Item> itemList = new ArrayList<Item>();
+
+		String sql = "SELECT i.id, i.name, i.quantity_available, c.id AS category_id, c.name AS category_name "
+				+ "FROM item i " + "INNER JOIN category c ON i.category_id=c.id " + "WHERE i.quantity_available < 10 AND i.quantity_available > 0 "
+				+ "ORDER BY i.id ASC";
+
+		try (Connection conn = DbConnectionFactory.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Item item = new Item();
+					item.setId(rs.getInt("id"));
+					item.setName(rs.getString("name"));
+					item.setQuantityAvailable(rs.getInt("quantity_available"));
+					item.setCategory(new Category(rs.getInt("category_id"), rs.getString("category_name")));
+					itemList.add(item);
+				}
+			}
+		}
+		return itemList;
+	}
+	
+	public List<Item> getOutOfStockItems() throws SQLException {
+		List<Item> itemList = new ArrayList<Item>();
+
+		String sql = "SELECT i.id, i.name, c.id AS category_id, c.name AS category_name "
+				+ "FROM item i " + "INNER JOIN category c ON i.category_id=c.id " + "WHERE i.quantity_available = 0 "
+				+ "ORDER BY i.id ASC";
+
+		try (Connection conn = DbConnectionFactory.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Item item = new Item();
+					item.setId(rs.getInt("id"));
+					item.setName(rs.getString("name"));
+					item.setCategory(new Category(rs.getInt("category_id"), rs.getString("category_name")));
+					itemList.add(item);
+				}
+			}
+		}
+		return itemList;
+	}
+
 	// Helper method to detect unique constraint violations
 	private boolean isUniqueConstraintViolation(SQLException e) {
 		String sqlState = e.getSQLState();
