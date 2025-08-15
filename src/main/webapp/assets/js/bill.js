@@ -309,12 +309,14 @@ function createBill() {
 
 	// Get Sri Lanka time
 	const now = new Date();
-	const optionsDate = { timeZone: 'Asia/Colombo', year: 'numeric', month: '2-digit', day: '2-digit' };
 	const optionsTime = { timeZone: 'Asia/Colombo', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
 
 	// Format date to YYYY-MM-DD
-	const [month, day, year] = now.toLocaleDateString('en-GB', optionsDate).split('/');
-	const date = `${year}-${month}-${day}`;
+	const yyyy = now.getFullYear();
+	const mm = String(now.getMonth() + 1).padStart(2, '0'); // months are 0-indexed
+	const dd = String(now.getDate()).padStart(2, '0');
+
+	const date = `${yyyy}-${mm}-${dd}`; // YYYY-MM-DD
 
 	// Format time to HH:MM:SS
 	const time = now.toLocaleTimeString('en-GB', optionsTime);
