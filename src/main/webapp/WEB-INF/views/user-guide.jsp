@@ -46,7 +46,7 @@
 						<span class="font-bold text-green-600">2</span>
 					</div>
 					<h3 class="text-lg font-semibold text-gray-900 mb-2">Dashboard
-						Navigation</h3>
+						Overview</h3>
 					<p class="text-gray-600">Understand the layout and features of
 						the dashboard.</p>
 				</a>
@@ -178,72 +178,96 @@
 			<h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
 				<span
 					class="step-number w-8 h-8 rounded-full text-white text-sm font-semibold flex items-center justify-center mr-3">2</span>
-				Dashboard Navigation
+				Dashboard Overview
 			</h2>
 
-			<p class="text-gray-600 mb-6">The main dashboard provides quick
-				access to all system features. Here's what each section offers:</p>
+			<p class="text-gray-600 mb-6">The main dashboard provides a
+				comprehensive overview of bookshop's performance with real-time
+				analytics and inventory management. Here's what each section
+				displays:</p>
 
-			<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-				<div class="bg-blue-50 rounded-lg p-6 text-center">
-					<div
-						class="feature-icon w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
-						<svg class="w-6 h-6 text-blue-600" fill="none"
-							stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-								stroke-linejoin="round" stroke-width="2"
-								d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-					</div>
-					<h3 class="font-semibold text-gray-900 mb-2">Create Bill</h3>
-					<p class="text-sm text-gray-600">Generate new customer bills
-						with item selection and pricing</p>
-				</div>
+			<!-- Key Metrics Section -->
+			<h3 class="text-lg font-semibold text-gray-800 mb-4">Real-time
+				Business Metrics</h3>
+			<div class="bg-gray-50 border-gray-300 p-4 rounded-lg my-2">
+				<div class="text-md text-gray-600">Track bookshop's financial
+					performance with automatically calculated totals, averages, and
+					customer analytics that updates in real-time as transactions occur.</div>
+			</div>
+			<div class="bg-grey-50 rounded-lg shadow-sm border p-3 mb-6">
+				<img alt="Example snapshot for dashboard metrics"
+					src="/bookshopManagement/assets/images/snapshot-dashboard-metrics.png">
+			</div>
 
-				<div class="bg-green-50 rounded-lg p-6 text-center">
-					<div
-						class="feature-icon w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
-						<svg class="w-6 h-6 text-green-600" fill="none"
-							stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-								stroke-linejoin="round" stroke-width="2"
-								d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-					</div>
-					<h3 class="font-semibold text-gray-900 mb-2">Manage Customers</h3>
-					<p class="text-sm text-gray-600">Add, edit, and view customer
-						information and purchase history</p>
+			<!-- Inventory Management Section -->
+			<h3 class="text-lg font-semibold text-gray-800 mb-4">Inventory
+				Management</h3>
+			<div class="bg-gray-50 border-gray-300 p-4 rounded-lg my-2">
+				<div class="text-md text-gray-600">Get instant visibility into
+					inventory status with categorized alerts for low stock and
+					out-of-stock items, helping you maintain optimal stock levels.</div>
+			</div>
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+				<div
+					class="bg-white border border-gray-200 border-l-4 border-yellow-500 p-6 rounded-lg">
+					<h4
+						class="flex items-center text-base font-semibold text-gray-700 mb-3">
+						<svg class="w-5 h-5 text-yellow-500 mr-2" fill="currentColor"
+							viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+								d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+								clip-rule="evenodd" />
+                    </svg>
+						Low Stock Alerts
+					</h4>
+					<p class="text-sm text-gray-600">Monitor items running low on
+						inventory with automatic alerts when stock levels reach minimum
+						thresholds.</p>
 				</div>
+				<div
+					class="bg-white border border-gray-200 border-l-4 border-red-500 p-6 rounded-lg">
+					<h4
+						class="flex items-center text-base font-semibold text-gray-700 mb-3">
+						<svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor"
+							viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+								d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+								clip-rule="evenodd" />
+                    </svg>
+						Out of Stock Items
+					</h4>
+					<p class="text-sm text-gray-600">Immediately identify products
+						that are completely out of stock and need urgent restocking to
+						avoid lost sales.</p>
+				</div>
+			</div>
 
-				<div class="bg-purple-50 rounded-lg p-6 text-center">
-					<div
-						class="feature-icon w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
-						<svg class="w-6 h-6 text-purple-600" fill="none"
-							stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-								stroke-linejoin="round" stroke-width="2"
-								d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-					</div>
-					<h3 class="font-semibold text-gray-900 mb-2">Search Inventory</h3>
-					<p class="text-sm text-gray-600">Quick search through your
-						entire book inventory</p>
-				</div>
 
-				<div class="bg-orange-50 rounded-lg p-6 text-center">
-					<div
-						class="feature-icon w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
-						<svg class="w-6 h-6 text-orange-600" fill="none"
-							stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-								stroke-linejoin="round" stroke-width="2"
-								d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-					</div>
-					<h3 class="font-semibold text-gray-900 mb-2">User Guide</h3>
-					<p class="text-sm text-gray-600">Access comprehensive help
-						documentation and tutorials</p>
-				</div>
+
+			<!-- Sales Analytics Section -->
+			<h3 class="text-lg font-semibold text-gray-800 mb-4">Sales
+				Analytics</h3>
+			<div class="bg-gray-50 border-gray-300 p-4 rounded-lg my-2">
+				<div class="text-md text-gray-600">Visual representation of
+					sales trends throughout the year, enabling management to make
+					informed decisions about inventory planning, marketing campaigns,
+					and business strategy.</div>
+			</div>
+			<div class="bg-white border border-gray-200 p-6 rounded-lg mb-6">
+				<h4
+					class="flex items-center text-base font-semibold text-gray-700 mb-3">
+					<svg class="w-5 h-5 text-blue-500 mr-2" fill="none"
+						stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+							stroke-width="2"
+							d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+					Monthly Sales Trends
+				</h4>
+				<p class="text-sm text-gray-600">Interactive line chart
+					displaying month-wise sales performance for the current year,
+					helping you identify seasonal patterns and track business growth
+					over time.</p>
 			</div>
 		</div>
 
