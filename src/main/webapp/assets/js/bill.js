@@ -347,7 +347,7 @@ function createBill() {
 		date: date,
 		time: time,
 		total: total,
-		cashierId: 1 // TODO: replace with actual user ID
+		cashierId: currentUser.id,
 	};
 
 	// Send the bill to the server

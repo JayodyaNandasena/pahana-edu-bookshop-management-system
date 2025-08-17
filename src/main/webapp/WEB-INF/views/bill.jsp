@@ -10,7 +10,7 @@
 
 <div class="ml-64 p-8">
 	<div class="max-w-7xl mx-auto">
-		<!-- Header -->		
+		<!-- Header -->
 		<div class="flex items-center justify-between mb-6">
 			<h1 class="text-3xl font-bold mb-2">Create New Bill</h1>
 			<button id="btn-new-bill"
@@ -219,8 +219,8 @@
 						<!-- Total -->
 						<div class="pt-4 border-t-2 border-gray-200">
 							<div class="flex justify-between items-center">
-								<span class="text-l font-bold text-gray-800">Total
-									Amount (Rs.)</span> <span class="text-2xl font-bold text-green-600"
+								<span class="text-l font-bold text-gray-800">Total Amount
+									(Rs.)</span> <span class="text-2xl font-bold text-green-600"
 									id="previewTotal">Rs. 0.00</span>
 							</div>
 						</div>
@@ -287,6 +287,11 @@
 </div>
 </dialog>
 
+<script type="text/javascript">
+    var currentUser = {
+        id: ${sessionScope.user.id}
+    };
+</script>
 <script
 	src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script type="text/javascript"
