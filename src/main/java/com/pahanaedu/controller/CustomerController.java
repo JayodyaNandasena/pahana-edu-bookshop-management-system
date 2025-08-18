@@ -17,12 +17,14 @@ import org.json.JSONObject;
 import com.pahanaedu.model.Customer;
 import com.pahanaedu.model.enums.PersistResult;
 import com.pahanaedu.service.CustomerService;
+import com.pahanaedu.service.exception.InactiveCustomerException;
+import com.pahanaedu.util.Toast;
 import com.pahanaedu.util.Validator;
 
 @WebServlet("/customer")
 public class CustomerController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	
+
 	private CustomerService customerService;
 
 	public CustomerController() {
@@ -36,6 +38,13 @@ public class CustomerController extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
+		if (request.getParameter("mobile") != null) {
+			String mobile = request.getParameter("mobile");
+			handleSearchByMobile(mobile, request, response);
+			return;
+		}
+
 		response.sendRedirect(request.getContextPath() + "/customers");
 	}
 
@@ -43,13 +52,6 @@ public class CustomerController extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String action = request.getParameter("action");
-
-		if ("searchByMobile".equals(action)) {
-			String mobile = request.getParameter("mobile");
-			request.setAttribute("mobile", mobile);
-			handleSearchByMobile(mobile, request, response);
-			return;
-		}
 
 		if ("update".equals(action)) {
 			handleUpdate(request, response);
@@ -87,7 +89,11 @@ public class CustomerController extends HttpServlet {
 	private void handleDeactivate(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String id = request.getParameter("id");
 
-		customerService.deactivate(id);
+		if (customerService.deactivate(id)) {
+			Toast.setToastCookie(response, "success", "Customer deactivated successfully!");
+		} else {
+			Toast.setToastCookie(response, "error", "Error deactivating the customer");
+		}
 
 		response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
 
@@ -97,7 +103,11 @@ public class CustomerController extends HttpServlet {
 	private void handleActivate(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String id = request.getParameter("id");
 
-		customerService.activate(id);
+		if (customerService.activate(id)) {
+			Toast.setToastCookie(response, "success", "Customer activated successfully!");
+		} else {
+			Toast.setToastCookie(response, "error", "Error activating the customer");
+		}
 
 		response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
 
@@ -137,6 +147,7 @@ public class CustomerController extends HttpServlet {
 
 		switch (result) {
 		case SUCCESS:
+			Toast.setToastCookie(response, "success", "Customer details updated successfully!");
 			response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
 			return;
 		case EMAIL_EXISTS:
@@ -155,24 +166,57 @@ public class CustomerController extends HttpServlet {
 		// On update error, set errors and form data in session and redirect
 		session.setAttribute("errors", errors);
 		session.setAttribute("customer", customerFormData);
+		Toast.setToastCookie(response, "error", "Error updating customer");
 		response.sendRedirect(request.getContextPath() + "/customers?q=" + id);
 	}
 
 	private void handleSearchByMobile(String mobile, HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+
+			// validate mobile input
+			HashMap<String, String> errors = new HashMap<String, String>();
+
+			if (!Validator.isValidPhoneNumber(mobile)) {
+				errors.put("mobileError", "Phone number must be a valid Sri Lankan mobile number (e.g., 0771234567).");
+			}
+
+			if (!errors.isEmpty()) {
+				writeJsonErrors(response, errors);
+				return;
+			}
+
+			// customer search if no input errors
 			Customer customer = customerService.getByMobile(mobile);
 
 			if (customer == null) {
-				request.setAttribute("errorMessage", "Customer not found with the provided mobile number.");
-			} else {
-				request.setAttribute("customer", customer);
+				errors.put("mobileError", "No Customer Found.");
+				writeJsonErrors(response, errors);
+				return;
 			}
-		} catch (SQLException e) {
-			request.setAttribute("errorMessage", "An error occurred while searching: " + e.getMessage());
-		}
 
-		request.getRequestDispatcher("/WEB-INF/views/bill.jsp").include(request, response);
+			JSONObject jsonResponse = new JSONObject();
+			JSONObject customerJson = new JSONObject();
+
+			customerJson.put("id", customer.getId());
+			customerJson.put("firstName", customer.getFirstName());
+			customerJson.put("lastName", customer.getLastName());
+			customerJson.put("email", customer.getEmail());
+
+			jsonResponse.put("success", true);
+			jsonResponse.put("customer", customerJson);
+
+			response.setContentType("application/json");
+			response.getWriter().write(jsonResponse.toString());
+
+			return;
+		} catch (InactiveCustomerException e) {
+			writeJsonError(response, e.getMessage());
+		} catch (SQLException e) {
+			writeJsonError(response, "No Customer Found.");
+		}
 	}
 
 	private void handleCustomerCreate(String firstName, String lastName, String phone, String email, String address,
@@ -183,8 +227,8 @@ public class CustomerController extends HttpServlet {
 
 		// If validation errors exist, return them as JSON response
 		if (!errors.isEmpty()) {
-		    writeJsonErrors(response, errors);
-		    return;
+			writeJsonErrors(response, errors);
+			return;
 		}
 
 		try {
@@ -217,8 +261,8 @@ public class CustomerController extends HttpServlet {
 			}
 
 			// Return errors if persistence fails due to known constraints
-			writeJsonErrors(response, errors);	
-			
+			writeJsonErrors(response, errors);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			// Return a generic error message on unexpected exceptions
@@ -259,19 +303,19 @@ public class CustomerController extends HttpServlet {
 	}
 
 	private void writeJsonErrors(HttpServletResponse response, Map<String, String> errors) throws IOException {
-	    JSONObject jsonResponse = new JSONObject();
-	    jsonResponse.put("success", false);
-	    jsonResponse.put("errors", new JSONObject(errors)); // converts Map to JSON object automatically
+		JSONObject jsonResponse = new JSONObject();
+		jsonResponse.put("success", false);
+		jsonResponse.put("errors", new JSONObject(errors)); // converts Map to JSON object automatically
 
-	    response.getWriter().write(jsonResponse.toString());
+		response.getWriter().write(jsonResponse.toString());
 	}
-	
-	private void writeJsonError(HttpServletResponse response, String message) throws IOException {
-	    JSONObject jsonResponse = new JSONObject();
-	    jsonResponse.put("success", false);
-	    jsonResponse.put("message", message);
 
-	    response.getWriter().write(jsonResponse.toString());
+	private void writeJsonError(HttpServletResponse response, String message) throws IOException {
+		JSONObject jsonResponse = new JSONObject();
+		jsonResponse.put("success", false);
+		jsonResponse.put("message", message);
+
+		response.getWriter().write(jsonResponse.toString());
 	}
 
 }

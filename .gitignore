@@ -1,3 +1,4 @@
 src/main/resources/database.properties
 target/classes/database.properties
 /target/
+src/main/resources/email.properties

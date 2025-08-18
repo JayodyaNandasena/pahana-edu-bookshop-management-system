@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Bill {
 	private long id;
+	private String code;
 	private LocalDate date;
 	private LocalTime time;
 	private double total;
@@ -16,9 +17,10 @@ public class Bill {
 	public Bill() {
 	}
 
-	public Bill(long id, LocalDate date, LocalTime time, double total, Customer customer, User cashier,
+	public Bill(long id, String code, LocalDate date, LocalTime time, double total, Customer customer, User cashier,
 			List<BillItem> billItems) {
 		this.id = id;
+		this.code = code;
 		this.date = date;
 		this.time = time;
 		this.total = total;
@@ -27,12 +29,24 @@ public class Bill {
 		this.billItems = billItems;
 	}
 
+	public Bill(long id) {
+		this.id = id;
+	}
+
 	public long getId() {
 		return id;
 	}
 
 	public void setId(long id) {
 		this.id = id;
+	}
+	
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public LocalDate getDate() {

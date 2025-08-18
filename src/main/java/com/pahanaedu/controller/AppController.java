@@ -2,6 +2,7 @@ package com.pahanaedu.controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -19,10 +20,11 @@ import com.pahanaedu.util.Validator;
 
 import com.pahanaedu.model.Category;
 import com.pahanaedu.model.Item;
+import com.pahanaedu.service.BillService;
 import com.pahanaedu.service.CategoryService;
 import com.pahanaedu.service.ItemService;
 
-@WebServlet(urlPatterns = { "/", "/bill", "/customers", "/dashboard", "/inventory" })
+@WebServlet(urlPatterns = { "/", "/bill", "/customers", "/dashboard", "/inventory", "/user-guide" })
 public class AppController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -54,6 +56,7 @@ public class AppController extends HttpServlet {
 			request.setAttribute("activePage", "customers");
 			break;
 		case "/dashboard":
+			handleDashboard(request);
 			targetPage = "/WEB-INF/views/dashboard.jsp";
 			request.setAttribute("activePage", "dashboard");
 			break;
@@ -61,6 +64,10 @@ public class AppController extends HttpServlet {
 			handleInventoryPage(request);
 			request.setAttribute("activePage", "inventory");
 			targetPage = "/WEB-INF/views/inventory.jsp";
+			break;
+		case "/user-guide":
+			targetPage = "/WEB-INF/views/user-guide.jsp";
+			request.setAttribute("activePage", "user-guide");
 			break;
 		default:
 			targetPage = "/WEB-INF/views/404.jsp";
@@ -109,44 +116,48 @@ public class AppController extends HttpServlet {
 			request.setAttribute("error", "Unable to search customer.");
 		}
 	}
-	
+
 	private void handleInventoryPage(HttpServletRequest request) {
 		try {
 			List<Category> categories = CategoryService.getInstance().all();
 			List<Item> items;
-			
+
 			String categoryIdParam = request.getParameter("category");
-			String searchParam = request.getParameter("q");			
+			String searchParam = request.getParameter("q");
 
 			Integer selectedCategoryId = null;
 
 			if (categoryIdParam != null && !categoryIdParam.isEmpty()) {
-			    try {
-			        int categoryId = Integer.parseInt(categoryIdParam);
+				try {
+					int categoryId = Integer.parseInt(categoryIdParam);
 
-			        // Check if this ID exists in the category list
-			        boolean categoryExists = categories.stream()
-			            .anyMatch(c -> c.getId() == categoryId);
+					// Check if this ID exists in the category list
+					boolean categoryExists = categories.stream().anyMatch(c -> c.getId() == categoryId);
 
-			        if (categoryExists) {
-			            selectedCategoryId = categoryId;
-			            items = ItemService.getInstance().byCategory(categoryId);
-			        } else {
-			            // Invalid category
-			            items = ItemService.getInstance().all();
-			        }
+					if (categoryExists) {
+						selectedCategoryId = categoryId;
+						items = ItemService.getInstance().byCategory(categoryId);
+					} else {
+						// Invalid category
+						items = ItemService.getInstance().all();
+					}
 
-			    } catch (NumberFormatException e) {
-			        // Invalid input
-			        items = ItemService.getInstance().all();
-			    }
-			} else if (searchParam != null && !searchParam.isEmpty()){
-				items = ItemService.getInstance().byIdOrName(searchParam);
+				} catch (NumberFormatException e) {
+					// Invalid input
+					items = ItemService.getInstance().all();
+				}
+			} else if (searchParam != null && !searchParam.isEmpty()) {
+				if ("deleted".equals(searchParam)) {
+					items = ItemService.getInstance().getDeleted();
+				} else {
+					items = ItemService.getInstance().byIdOrName(searchParam);
+				}
+
 				selectedCategoryId = -1;
 			} else {
-			    // No category selected
-			    items = ItemService.getInstance().all();
-			}			
+				// No category selected
+				items = ItemService.getInstance().all();
+			}
 
 			request.setAttribute("items", items);
 			request.setAttribute("categories", categories);
@@ -155,5 +166,43 @@ public class AppController extends HttpServlet {
 			e.printStackTrace();
 			request.setAttribute("error", "Unable to load items.");
 		}
+	}
+
+	private void handleDashboard(HttpServletRequest request) {
+		// get total revenue
+		Double totalBills = 0.0;
+		Double averageBills = 0.0;
+		int activeCustomerCount = 0;
+		Double averagePerCustomer = 0.0;
+		List<Item> lowStockItems = new ArrayList<Item>();
+		List<Item> outOfStockItems = new ArrayList<Item>();
+		List<Double> monthlyRevenues = new ArrayList<Double>();
+		
+		try {
+			totalBills = BillService.getInstance().getTotalRevenue();
+			// get average order value
+			averageBills = BillService.getInstance().getAverageBillValue();
+			// get number of active customers
+			activeCustomerCount = CustomerService.getInstance().getActiveCustomerCount();
+			// get average revenue per customer
+			averagePerCustomer = Math.round((totalBills / activeCustomerCount) * 100.0) / 100.0;
+			// get low stock items
+			lowStockItems = ItemService.getInstance().getLowStockItems();
+			// get out of stock items
+			outOfStockItems = ItemService.getInstance().getOutOfStockItems();
+			// get sales details
+			monthlyRevenues = BillService.getInstance().getMonthlyRevenues();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		request.setAttribute("totalBills", totalBills);
+		request.setAttribute("averageBills", averageBills);
+		request.setAttribute("activeCustomerCount", activeCustomerCount);
+		request.setAttribute("averagePerCustomer", averagePerCustomer);
+		request.setAttribute("lowStockItems", lowStockItems);
+		request.setAttribute("outOfStockItems", outOfStockItems);
+		request.setAttribute("monthlyRevenues", monthlyRevenues);
 	}
 }

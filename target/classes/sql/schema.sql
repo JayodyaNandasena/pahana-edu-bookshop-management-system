@@ -48,11 +48,13 @@ CREATE TABLE user (
 -- ==== BILL ==== 
 CREATE TABLE bill (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(100),
     customer_id BIGINT NOT NULL,
     cashier_id BIGINT NOT NULL,
     bill_date DATE NOT NULL,
     bill_time TIME NOT NULL,
     total DECIMAL(12,2) NOT NULL,
+    UNIQUE KEY bill_code_unique (code),
     CONSTRAINT chk_total_nonnegative CHECK (total >= 0),
     CONSTRAINT fk_bill_customer FOREIGN KEY (customer_id)
         REFERENCES customer(id)
@@ -90,3 +92,21 @@ CREATE INDEX idx_bill_customer     ON bill(customer_id);
 CREATE INDEX idx_bill_user         ON bill(cashier_id);
 CREATE INDEX idx_billitem_bill     ON bill_item(bill_id);
 CREATE INDEX idx_billitem_item     ON bill_item(item_id);
+
+
+GRANT CREATE ROUTINE ON pahana_edu_db.* TO 'root'@'localhost';
+FLUSH PRIVILEGES;
+
+ROP FUNCTION IF EXISTS get_total_bill;
+
+CREATE FUNCTION get_total_bill()
+RETURNS DECIMAL(12,2)
+DETERMINISTIC
+RETURN (SELECT SUM(total) FROM bill);
+
+DROP FUNCTION IF EXISTS get_average_bill;
+
+CREATE FUNCTION get_average_bill()
+RETURNS DECIMAL(12,2)
+DETERMINISTIC
+RETURN (SELECT AVG(total) FROM bill);

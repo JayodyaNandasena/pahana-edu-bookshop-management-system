@@ -150,7 +150,8 @@
         })
         .then(response => {
           if (!response.ok) {
-            throw new Error("Network response was not ok");
+            toastr.error("Network response was not ok");
+            return;
           }
           return response.json();
         })
@@ -163,7 +164,7 @@
   		  });
   		
   		  if (data.success) {
-  		    alert(data.message || "Item created successfully!");
+  			toastr.success(data.message || "Item created successfully!");
   		    document.getElementById("new-item-modal").close();
   		    form.reset();
   		  	window.location.reload();
@@ -181,12 +182,12 @@
   		    }	    
   		 	 
   		  } else {
-  		    alert("An error occurred while creating the item.");
+  			toastr.error("An error occurred while creating the item.");
   		  }
   		})
         .catch(error => {
           // Handle error
-          alert("There was a problem creating the item: " + error.message);
+          toastr.error("There was a problem creating the item: " + error.message);
         });
       });
   });
