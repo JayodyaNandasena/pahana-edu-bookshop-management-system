@@ -107,7 +107,7 @@ public class LoginServiceTest {
 		// Given
 		String username = "testuser";
 		String password = "testpass";
-		User expectedUser = new User(); // Assuming User has a default constructor
+		User expectedUser = new User();
 		when(mockLoginDao.authenticateUser(username, password)).thenReturn(expectedUser);
 
 		// When
