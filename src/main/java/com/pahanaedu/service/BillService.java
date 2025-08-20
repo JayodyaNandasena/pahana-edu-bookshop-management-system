@@ -116,7 +116,6 @@ public class BillService {
 	}
 
 	public Double getTotalRevenue() throws SQLException {
-		// TODO Auto-generated method stub
 		return billDao.getTotal();
 	}
 
