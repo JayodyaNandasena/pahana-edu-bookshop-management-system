@@ -108,6 +108,7 @@ public class CustomerServiceTest {
         Customer mockCustomer = new Customer();
         mockCustomer.setId(1);
         mockCustomer.setPhone("0771234567");
+        mockCustomer.setIsActive(true);
 
         when(mockCustomerDao.getByMobile("0771234567")).thenReturn(mockCustomer);
 
