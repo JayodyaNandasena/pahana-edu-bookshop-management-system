@@ -55,9 +55,10 @@
 
 	<!-- Logout -->
 	<div class="absolute bottom-6 left-6">
-		<button
+		<a href="<c:url value='/logout'/>"
 			class="flex items-center space-x-2 text-gray-600 hover:text-red-600 transition-colors">
 			<i class="fa-solid fa-right-from-bracket fa-fw"></i> <span>Logout</span>
-		</button>
+		</a>
 	</div>
+
 </div>

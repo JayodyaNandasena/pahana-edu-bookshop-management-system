@@ -31,22 +31,28 @@ public class AuthFilter implements Filter {
 
         String path = request.getServletPath();
 
-        // Allow public resources (index, login, assets, etc.)
-        if (path.equals("/index.jsp") || path.equals("/") || path.startsWith("/assets/") || path.equals("/login")) {
+        // Allow public resources without auth
+        if (path.equals("/") || path.equals("/index.jsp") || path.equals("/login") || path.startsWith("/assets/")) {
             chain.doFilter(req, res);
             return;
         }
 
-        // Check authentication
+        // Check if user is logged in
         HttpSession session = request.getSession(false);
         boolean loggedIn = (session != null && session.getAttribute("user") != null);
 
         if (!loggedIn) {
+            // Redirect to login page
             response.sendRedirect(request.getContextPath() + "/");
             return;
         }
 
-        // Continue request
+        // Prevent caching of protected pages to avoid access after logout
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+        response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+        response.setDateHeader("Expires", 0); // Proxies
+
+        // Proceed with the request
         chain.doFilter(req, res);
     }
 
