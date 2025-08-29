@@ -48,70 +48,70 @@ public class BillService {
 	}
 
 	public Bill byId(int id) throws SQLException {
-		return null;
+		return billDao.byId(id);
 	}
 
-	public Bill persist(int customerId, JSONArray itemsJsonArray, String date, String time, double total,
-			int cashierId) throws SQLException {
+	public Bill persist(int customerId, JSONArray itemsJsonArray, String date, String time, double total, int cashierId)
+			throws SQLException {
 		int unitsConsumed = 0;
 		List<BillItem> billItems = new ArrayList<>();
 
 		for (int i = 0; i < itemsJsonArray.length(); i++) {
-	        JSONObject itemJson = itemsJsonArray.getJSONObject(i);
-	        
-	        int quantity = itemJson.getInt("quantity");
+			JSONObject itemJson = itemsJsonArray.getJSONObject(i);
 
-	        BillItem billItem = new BillItem();
-	        billItem.setItem(new Item(itemJson.getInt("id")));
-	        billItem.setQuantity(quantity);
-	        billItem.setUnitPrice(itemJson.getDouble("unitPrice"));
+			int quantity = itemJson.getInt("quantity");
 
-	        billItems.add(billItem);
-	        
-	        unitsConsumed += quantity;
-	    }
-		
+			BillItem billItem = new BillItem();
+			billItem.setItem(new Item(itemJson.getInt("id")));
+			billItem.setQuantity(quantity);
+			billItem.setUnitPrice(itemJson.getDouble("unitPrice"));
+
+			billItems.add(billItem);
+
+			unitsConsumed += quantity;
+		}
+
 		Bill bill = new Bill();
-		
+
 		bill.setDate(LocalDate.parse(date));
 		bill.setTime(LocalTime.parse(time));
 		bill.setTotal(total);
 		bill.setCustomer(new Customer(customerId));
-		bill.setCashier(new User(cashierId));		
-		
+		bill.setCashier(new User(cashierId));
+
 		Connection conn = DbConnectionFactory.getConnection();
 		try {
 			conn.setAutoCommit(false);
-			
+
 			// 1. Add bill
-            Bill savedBill = billDao.persist(bill, conn);
+			Bill savedBill = billDao.persist(bill, conn);
 
-            // 2. Add bill items with billId
-            for (BillItem item : billItems) {
-                item.setBill(new Bill(savedBill.getId()));
-                billItemDao.persist(item, conn);
-            }
+			// 2. Add bill items with billId
+			for (BillItem item : billItems) {
+				item.setBill(new Bill(savedBill.getId()));
+				billItemDao.persist(item, conn);
+			}
 
-            // 3. Reduce quantity for each item
-            for (BillItem item : billItems) {
-                itemDao.reduceQuantity(item.getItem().getId(), item.getQuantity(), conn);
-            }
+			// 3. Reduce quantity for each item
+			for (BillItem item : billItems) {
+				itemDao.reduceQuantity(item.getItem().getId(), item.getQuantity(), conn);
+			}
 
-            // 4. Increase units consumed for customer
-            customerDao.increaseUnitsConsumed(bill.getCustomer().getId(), unitsConsumed, conn);
+			// 4. Increase units consumed for customer
+			customerDao.increaseUnitsConsumed(bill.getCustomer().getId(), unitsConsumed, conn);
 
-            conn.commit();  // Commit transaction
-            
-            return savedBill;
+			conn.commit(); // Commit transaction
+
+			return savedBill;
 		} catch (SQLException e) {
 			if (conn != null) {
-                try {
-                    conn.rollback(); // Rollback on error
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-            throw e;  // rethrow exception after rollback
+				try {
+					conn.rollback(); // Rollback on error
+				} catch (SQLException ex) {
+					ex.printStackTrace();
+				}
+			}
+			throw e; // rethrow exception after rollback
 		}
 	}
 

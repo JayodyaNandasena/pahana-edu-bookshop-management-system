@@ -17,7 +17,6 @@ import javax.servlet.http.HttpSession;
 import com.pahanaedu.model.Customer;
 import com.pahanaedu.service.CustomerService;
 import com.pahanaedu.util.Validator;
-
 import com.pahanaedu.model.Category;
 import com.pahanaedu.model.Item;
 import com.pahanaedu.service.BillService;
@@ -177,7 +176,7 @@ public class AppController extends HttpServlet {
 		List<Item> lowStockItems = new ArrayList<Item>();
 		List<Item> outOfStockItems = new ArrayList<Item>();
 		List<Double> monthlyRevenues = new ArrayList<Double>();
-		
+
 		try {
 			totalBills = BillService.getInstance().getTotalRevenue();
 			// get average order value
@@ -205,4 +204,5 @@ public class AppController extends HttpServlet {
 		request.setAttribute("outOfStockItems", outOfStockItems);
 		request.setAttribute("monthlyRevenues", monthlyRevenues);
 	}
+
 }

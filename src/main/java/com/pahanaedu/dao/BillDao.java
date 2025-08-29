@@ -14,13 +14,70 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.pahanaedu.model.Bill;
+import com.pahanaedu.model.BillItem;
+import com.pahanaedu.model.Customer;
+import com.pahanaedu.model.Item;
+import com.pahanaedu.model.User;
 import com.pahanaedu.util.DbConnectionFactory;
 
 public class BillDao {
 
-	public Bill byId(int id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Bill byId(int id) throws SQLException {
+	    Bill bill = null;
+
+	    String sql = """
+	        SELECT 
+	            b.id AS bill_id, b.bill_date, b.bill_time, b.total, b.code, b.cashier_id, 
+	            u.name AS cashier_name,
+	            bi.id AS bill_item_id, bi.quantity, bi.unit_price,
+	            i.id AS item_id, i.name AS item_name
+	        FROM bill b
+	        LEFT JOIN bill_item bi ON b.id = bi.bill_id
+	        LEFT JOIN item i ON bi.item_id = i.id
+	        LEFT JOIN user u ON b.cashier_id = u.id
+	        WHERE b.id = ?
+	    """;
+
+	    try (Connection conn = DbConnectionFactory.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+	        stmt.setInt(1, id);
+
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            while (rs.next()) {
+	                if (bill == null) {
+	                    // initialize bill
+	                    bill = new Bill();
+	                    bill.setId(rs.getInt("bill_id"));
+	                    bill.setDate(rs.getDate("bill_date").toLocalDate());
+	                    bill.setTime(rs.getTime("bill_time").toLocalTime());
+	                    bill.setTotal(rs.getDouble("total"));
+	                    bill.setCode(rs.getString("code"));
+	                    bill.setCashier(new User(rs.getInt("cashier_id"), rs.getString("cashier_name")));
+
+	                    bill.setBillItems(new ArrayList<>());
+	                }
+
+	                int billItemId = rs.getInt("bill_item_id");
+	                if (billItemId > 0) {
+	                    BillItem billItem = new BillItem();
+	                    billItem.setId(billItemId);
+	                    billItem.setQuantity(rs.getInt("quantity"));
+	                    billItem.setUnitPrice(rs.getDouble("unit_price"));
+
+	                    // set item details
+	                    Item item = new Item();
+	                    item.setId(rs.getInt("item_id"));
+	                    item.setName(rs.getString("item_name"));
+
+	                    billItem.setItem(item);
+	                    bill.getBillItems().add(billItem);
+	                }
+	            }
+	        }
+	    }
+
+	    return bill;
 	}
 
 	public Bill persist(Bill bill, Connection conn) throws SQLException {

@@ -15,7 +15,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.pahanaedu.model.Bill;
-import com.pahanaedu.model.enums.PersistResult;
 import com.pahanaedu.service.BillService;
 
 @WebServlet("/bills")
@@ -34,8 +33,13 @@ public class BillController extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		if (request.getParameter("id") != null) {
+			String id = request.getParameter("id");
+			handleSearchById(id, request, response);
+			return;
+		}
+
+		response.sendRedirect(request.getContextPath() + "/bills");
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -68,18 +72,45 @@ public class BillController extends HttpServlet {
 		}
 	}
 
+	private void handleSearchById(String id, HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		try {
+			// parse ID
+			int billId = Integer.parseInt(id);
+
+			// fetch bill
+			Bill bill = billService.byId(billId);
+
+			// if bill not found
+			if (bill == null) {
+				throw new Exception("Bill not found");
+			}
+
+			request.setAttribute("bill", bill);
+			request.setAttribute("activePage", "customers");
+			request.getRequestDispatcher("WEB-INF/views/view-bill.jsp").forward(request, response);
+		} catch (Exception e) {
+			// set 404 status
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+
+			// forward to 404 page
+			request.setAttribute("pageTitle", "Page Not Found");
+			request.getRequestDispatcher("/error/404.jsp").forward(request, response);
+		}
+	}
+
 	private void handleBillCreate(int customerId, JSONArray items, String date, String time, double total,
 			int cashierId, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		HashMap<String, String> errors = new HashMap<String, String>();
-		
+
 		try {
 			// Attempt to persist customer data and handle result accordingly
 			Bill bill = billService.persist(customerId, items, date, time, total, cashierId);
 
-			if(bill != null) {
+			if (bill != null) {
 				writeJsonSuccess(response, "Bill created successfully.", bill.getCode());
 				return;
-			}			
+			}
 
 			// Return errors if persistence fails due to known constraints
 			writeJsonErrors(response, errors);

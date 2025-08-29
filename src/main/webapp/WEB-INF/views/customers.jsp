@@ -245,7 +245,7 @@ Map<String, String> errors = (Map<String, String>) request.getAttribute("errors"
 					<div id="itemsList" class="divide-y divide-gray-100">
 						<c:if test="${not hasEmptyBills}">
 							<c:forEach var="bill" items="${customer.bills}">
-								<div
+								<a href="bills?id=${bill.id}"
 									class="grid grid-cols-9 px-3 py-4 text-gray-700 hover:bg-gray-50 transition-colors duration-150">
 									<div class="text-center font-medium col-span-2">${bill.id}</div>
 									<div class="text-center col-span-2">${bill.date}</div>
@@ -260,7 +260,7 @@ Map<String, String> errors = (Map<String, String>) request.getAttribute("errors"
 											class="fa fa-angle-right text-gray-400 hover:text-gray-600 cursor-pointer"
 											aria-hidden="true"></i>
 									</div>
-								</div>
+								</a>
 							</c:forEach>
 						</c:if>
 					</div>
