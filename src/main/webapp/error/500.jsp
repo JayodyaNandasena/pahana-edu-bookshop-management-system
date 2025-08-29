@@ -23,7 +23,7 @@
 			<div class="mt-10 flex items-center justify-center gap-x-6">
 				<a href="<c:url value='/dashboard' />"
 					class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-					Go back to dashboard </a> <a href="mailto:support@yourdomain.com"
+					Go back to dashboard </a> <a href="<c:url value='/user-guide' />"
 					class="text-sm font-semibold text-gray-900"> Contact support <span
 					aria-hidden="true">&rarr;</span>
 				</a>

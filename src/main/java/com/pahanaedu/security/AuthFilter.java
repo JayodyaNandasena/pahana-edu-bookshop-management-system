@@ -12,49 +12,60 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.pahanaedu.model.User;
+
 @WebFilter("/*")
 public class AuthFilter implements Filter {
-       
-    public AuthFilter() {
-        super();
-    }
+
+	public AuthFilter() {
+		super();
+	}
 
 	public void destroy() {
 	}
 
 	@Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
-            throws IOException, ServletException {
+	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+			throws IOException, ServletException {
 
-        HttpServletRequest request = (HttpServletRequest) req;
-        HttpServletResponse response = (HttpServletResponse) res;
+		HttpServletRequest request = (HttpServletRequest) req;
+		HttpServletResponse response = (HttpServletResponse) res;
 
-        String path = request.getServletPath();
+		String path = request.getServletPath();
 
-        // Allow public resources without auth
-        if (path.equals("/") || path.equals("/index.jsp") || path.equals("/login") || path.startsWith("/assets/")) {
-            chain.doFilter(req, res);
-            return;
-        }
+		// Allow public resources without auth
+		if (path.equals("/") || path.equals("/index.jsp") || path.equals("/login") || path.startsWith("/assets/")) {
+			chain.doFilter(req, res);
+			return;
+		}
 
-        // Check if user is logged in
-        HttpSession session = request.getSession(false);
-        boolean loggedIn = (session != null && session.getAttribute("user") != null);
+		// Check if user is logged in
+		HttpSession session = request.getSession(false);
+		User user = (User) session.getAttribute("user");
+		boolean loggedIn = (session != null && user != null);
 
-        if (!loggedIn) {
-            // Redirect to login page
-            response.sendRedirect(request.getContextPath() + "/");
-            return;
-        }
+		if (!loggedIn) {
+			// Redirect to login page
+			response.sendRedirect(request.getContextPath() + "/");
+			return;
+		}
 
-        // Prevent caching of protected pages to avoid access after logout
-        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
-        response.setHeader("Pragma", "no-cache"); // HTTP 1.0
-        response.setDateHeader("Expires", 0); // Proxies
+		String role = user.getUserType().toString();
 
-        // Proceed with the request
-        chain.doFilter(req, res);
-    }
+		// Deny staff from accessing /inventory?q=deleted
+		if ("STAFF".equals(role) && path.equals("/inventory") && "deleted".equals(request.getParameter("q"))) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN);
+			return;
+		}
+
+		// Prevent caching of protected pages to avoid access after logout
+		response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+		response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+		response.setDateHeader("Expires", 0); // Proxies
+
+		// Proceed with the request
+		chain.doFilter(req, res);
+	}
 
 	public void init(FilterConfig fConfig) throws ServletException {
 	}

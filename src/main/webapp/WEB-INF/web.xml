@@ -59,6 +59,11 @@
 		<error-code>404</error-code>
 		<location>/error/404.jsp</location>
 	</error-page>
+	<!-- Forbidden Error -->
+	<error-page>
+		<error-code>403</error-code>
+		<location>/error/403.jsp</location>
+	</error-page>
 	<!-- Internal Server Error -->
 	<error-page>
 		<error-code>500</error-code>
