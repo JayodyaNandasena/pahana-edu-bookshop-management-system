@@ -372,7 +372,7 @@ function createBill() {
 				document.getElementById("btn-pdf").disabled = false;
 				toastr.success(data.message || "Bill added successfully!");
 
-				btnGenerateBill.textContent = "Generate Bill";
+				btnGenerateBill.textContent = "Bill Generated";
 
 				sendBillEmail(date, time);
 			} else if (data.errors) {
